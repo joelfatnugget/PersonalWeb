@@ -27,6 +27,7 @@
 		"@hugeicons/svelte": "^1.0.3",
 		"@iconify/svelte": "^5.1.0",
 		"@skeletonlabs/skeleton": "^4.8.0",
+		"@tailwindcss/postcss": "^4.1.18",
 		"bits-ui": "^2.14.4",
 		"clsx": "^2.1.1",
 		"flowbite": "^4.0.1",
