@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+/* Skeleton Imports */
+@import "../node_modules/@skeletonlabs/skeleton/src/base/globals.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/base/theme.css";
+
+/* Utilities */
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/core.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/badges.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/buttons.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/cards.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/chips.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/dividers.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/placeholders.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/presets.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/tables.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/typography.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/form-core.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/form-groups.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/form-inputs.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/form-progress.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/form-radios-checks.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/form-selects.css";
+@import "../node_modules/@skeletonlabs/skeleton/src/utilities/form-textareas.css";
+
+@import "@skeletonlabs/skeleton/themes/wintry";

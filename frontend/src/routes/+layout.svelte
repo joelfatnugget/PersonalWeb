@@ -1,14 +1,47 @@
 <script lang="ts">
-	import '@skeletonlabs/skeleton';
-	import '@skeletonlabs/skeleton/themes/wintry.css';
 	import '../app.css';
+    import { page } from '$app/stores';
+    import { fly } from 'svelte/transition';
+    import { cubicOut } from 'svelte/easing';
+    // import { AppShell } from '@skeletonlabs/skeleton';
+	import Navbar from '$lib/components/Navbar.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import Dock from '$lib/components/Dock.svelte';
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children } = $props();
 </script>
 
 <svelte:head>
+	<title>Joel Tan | Building Digital Excellence</title>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children()}
+<!-- AppShell handles the main layout structure (Header, Content, Footer) -->
+<!-- <AppShell>
+    {#snippet header()}
+        <Navbar />
+    {/snippet} -->
+
+    <Navbar />
+
+    <!-- Main Content Area with Transitions -->
+    <main class="min-h-screen pt-20 pb-24 overflow-x-hidden"> <!-- Added overflow-x-hidden -->
+        {#key $page.url.pathname}
+            <div 
+                in:fly={{ y: 20, duration: 400, delay: 100, easing: cubicOut }} 
+                class="w-full h-full"
+            >
+                {@render children()}
+            </div>
+        {/key}
+    </main>
+    <Footer />
+<!-- 
+    {#snippet footer()}
+        <Footer />
+    {/snippet}
+    
+    <Dock />
+</AppShell> -->
+<Dock />
