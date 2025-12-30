@@ -125,35 +125,53 @@
             margin: 0;
             size: auto;
         }
-        :global(nav), :global(footer), .no-print {
+
+        /* Hide everything globally by default */
+        :global(body) {
+            visibility: hidden;
+            background: white !important;
+        }
+
+        /* Specifically hide the controls to be safe */
+        .no-print, :global(nav), :global(footer) {
             display: none !important;
         }
-        :global(body) {
-            background: white !important;
-            color: black !important;
-        }
-        :global(main) {
-            padding: 0 !important;
-            margin: 0 !important;
-            min-height: auto !important;
-            overflow: visible !important;
-        }
+
+        /* Make the resume container visible and position it at the very top */
         .resume-paper {
-            display: block !important;
-            box-shadow: none !important;
-            padding: 15mm 20mm !important; /* Standard margin */
-            margin: 0 !important;
+            visibility: visible;
+            position: absolute;
+            left: 0;
+            top: 0;
             width: 100% !important;
             max-width: none !important;
-            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 15mm 20mm !important;
+            box-shadow: none !important;
             background: white !important;
+            color: black !important;
+            overflow: visible !important;
         }
+
+        /* Ensure all children of the resume are visible */
+        .resume-paper * {
+            visibility: visible;
+        }
+
+        /* Ensure links and text are black */
         a {
             text-decoration: none !important;
             color: black !important;
         }
         .no-print-color {
             color: black !important;
+        }
+        
+        /* Force background graphics if user browser supports it/is set, 
+           but mainly ensure our background is white */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
     }
 </style>
