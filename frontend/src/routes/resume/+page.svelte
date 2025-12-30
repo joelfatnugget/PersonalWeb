@@ -2,10 +2,6 @@
     import { personalInfo, experiences, skills, education, achievements } from '$lib/data';
     import { formatDate } from '$lib/utils';
     import { Printer, ExternalLink } from 'lucide-svelte';
-
-    function printResume() {
-        window.print();
-    }
     
     // Helper to format skills as a comma-separated string for the "Proficient in..." line
     const skillList = skills.map(s => s.name).join(', ');
@@ -15,10 +11,10 @@
     
     <!-- Controls -->
     <div class="w-full max-w-[210mm] flex justify-end mb-4 no-print">
-        <button class="btn variant-filled-primary" onclick={printResume}>
+        <a href="/Joel_Tan_Resume.pdf" target="_blank" class="btn variant-filled-primary">
             <Printer class="mr-2 size-4" />
             Print / PDF
-        </button>
+        </a>
     </div>
 
     <!-- A4 Paper Resume -->
