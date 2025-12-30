@@ -23,7 +23,9 @@
         <Navbar />
     {/snippet} -->
 
-    <Navbar />
+    <div class="no-print">
+        <Navbar />
+    </div>
 
     <!-- Main Content Area with Transitions -->
     <main class="min-h-screen pt-20 pb-24 overflow-x-hidden"> <!-- Added overflow-x-hidden -->
@@ -36,7 +38,10 @@
             </div>
         {/key}
     </main>
-    <Footer />
+    
+    <div class="no-print">
+        <Footer />
+    </div>
 <!-- 
     {#snippet footer()}
         <Footer />
@@ -44,4 +49,6 @@
     
     <Dock />
 </AppShell> -->
-<Dock />
+<div class="no-print">
+    <Dock />
+</div>

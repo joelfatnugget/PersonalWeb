@@ -11,6 +11,11 @@ import {
     Terminal
 } from 'lucide-svelte';
 
+import visaLogo from '$lib/assets/logos/visa.png';
+import smbcLogo from '$lib/assets/logos/smbc.jpeg';
+import alignLogo from '$lib/assets/logos/align.jpeg';
+import cdgLogo from '$lib/assets/logos/comfortdelgro.png';
+
 // --- Interfaces ---
 
 export interface Skill {
@@ -29,6 +34,16 @@ export interface Experience {
     description: string[];
     skills: string[]; // Matches Skill.name
     logo?: string; // URL to company logo
+    color?: string; // Brand color hex code
+}
+
+export interface Education {
+    institution: string;
+    degree: string;
+    startDate: string;
+    endDate: string;
+    location: string;
+    description?: string[]; // Optional for awards/details like "Dean's List"
 }
 
 export interface Project {
@@ -56,11 +71,11 @@ export const personalInfo = {
     tagline: "Building digital experiences that matter.",
     about: "I'm a software engineer passionate about building scalable web applications and intuitive user interfaces. I specialize in the modern JavaScript stack and love solving complex problems with simple, elegant solutions.",
     email: "contact@example.com",
-    location: "Singapore"
+    location: "Singapore",
+    url: "https://www.linkedin.com/in/joeltanec/"
 };
 
 export const skills: Skill[] = [
-    { name: "Svelte", icon: "logos:svelte-icon", category: "frontend" },
     { name: "React", icon: "logos:react", category: "frontend" },
     { name: "Vue", icon: "logos:vue", category: "frontend" },
     { name: "Next.js", icon: "logos:nextjs-icon", category: "frontend" },
@@ -68,8 +83,6 @@ export const skills: Skill[] = [
     { name: "Tailwind CSS", icon: "logos:tailwindcss-icon", category: "frontend" },
     { name: "Node.js", icon: "logos:nodejs-icon", category: "backend" },
     { name: "Python", icon: "logos:python", category: "backend" },
-    { name: "Go", icon: "logos:go", category: "backend" },
-    { name: "PHP", icon: "logos:php", category: "backend" },
     { name: "PostgreSQL", icon: "logos:postgresql", category: "backend" },
     { name: "MySQL", icon: "logos:mysql", category: "backend" },
     { name: "Docker", icon: "logos:docker-icon", category: "tools" },
@@ -80,23 +93,132 @@ export const skills: Skill[] = [
     { name: "Jest", icon: "logos:jest", category: "tools" },
     { name: "Git", icon: "logos:git-icon", category: "tools" },
     { name: "Figma", icon: "logos:figma", category: "design" },
+    { name: "AWS", icon: "logos:aws", category: "tools" },
+    { name: "Azure", icon: "logos:azure-icon", category: "tools" },
 ];
 
 export const experiences: Experience[] = [
     {
-        id: "exp-tech-corp-2024",
-        role: "Software Engineer",
-        company: "Tech Corp",
+        id: "exp-visa-fullstack-2025",
+        role: "Fullstack Developer",
+        company: "Visa Inc",
         location: "Singapore",
-        startDate: "2024-01",
+        startDate: "2025-06",
         endDate: "Present",
         description: [
-            "Developing high-performance web applications using modern frameworks.",
-            "Collaborating with cross-functional teams to deliver scalable solutions.",
-            "Optimizing frontend performance and user experience."
+            "Led end-to-end Generative AI app development, slashing test case creation from 8,000 to 50 man-hours (98% efficiency gain).",
+            "Built custom RAG pipeline with cutting-edge AI, enabling first live demo in 5 months from initial Git commit.",
+            "Automated GTLIG analysis via fullstack solution, revolutionizing manual workflows."
         ],
-        skills: ["Svelte", "TypeScript", "Tailwind CSS"]
+        skills: ["Python", "React", "TypeScript", "Docker"],
+        color: "#1336CC",
+        logo: visaLogo
+    },
+    {
+        id: "exp-visa-intern-2024",
+        role: "Software Developer Intern",
+        company: "Visa Inc",
+        location: "Singapore",
+        startDate: "2024-05",
+        endDate: "2024-08",
+        description: [
+            "Improved functionality and user experience of the customer-facing Visa Test Portal.",
+            "Ensured smooth product rollout by resolving over 9 critical bugs in one week.",
+            "Achieved 1st Place in the APAC Case Competition, collaborating with cross-functional teams."
+        ],
+        skills: ["React", "TypeScript", "Tailwind CSS"],
+        color: "#1336CC",
+        logo: visaLogo
+    },
+    {
+        id: "exp-smbc-intern-2023",
+        role: "Security & Architecture Intern",
+        company: "Sumitomo Mitsui Banking Corporation",
+        location: "Singapore",
+        startDate: "2023-05",
+        endDate: "2023-07",
+        description: [
+            "Engineered automated patch deployment for Virtual Machines using Jenkins pipelines, reducing manual effort by ~70%.",
+            "Led evaluation of critical Proof of Concepts (JWT Caching, mTLS) for 10+ APIs across cloud infrastructure.",
+            "Authored comprehensive Cloud Operation Guidelines to standardize training and operational procedures."
+        ],
+        skills: ["Shell", "Python", "Azure"],
+        color: "#A0D235",
+        logo: smbcLogo
+    },
+    {
+        id: "exp-align-intern-2023",
+        role: "Mobile Development Intern",
+        company: "Align Technology",
+        location: "Singapore",
+        startDate: "2023-01",
+        endDate: "2023-04",
+        description: [
+            "Worked with regional management to shape Insight App capabilities and standards across APAC.",
+            "Translated high-level specifications into new/enhanced mobile application features.",
+            "Developed a Machine Learning Model to predict next quarter's sales."
+        ],
+        skills: ["Python", "React Native"],
+        color: "#0099CD",
+        logo: alignLogo
+    },
+    {
+        id: "exp-cdg-qa-2021",
+        role: "QA Tester (Adhoc)",
+        company: "ComfortDelGro",
+        location: "Singapore",
+        startDate: "2021-12",
+        endDate: "2022-12",
+        description: [
+            "Led Quality Assurance and testing, identifying critical defects and sub-optimal UX issues.",
+            "Used network troubleshooting tools (Burp Suite) to intercept and analyze API traffic.",
+            "Resolved over 30 reported software bugs, improving application quality."
+        ],
+        skills: ["Testing", "API Analysis"],
+        color: "#FBC02D",
+        logo: cdgLogo
+    },
+    {
+        id: "exp-cdg-support-2021",
+        role: "Support Specialist",
+        company: "ComfortDelGro",
+        location: "Singapore",
+        startDate: "2021-02",
+        endDate: "2021-07",
+        description: [
+            "Optimized IT infrastructure through building and upgrading hardware/software.",
+            "Drove 70% efficiency gains by deploying an automated computer installation process using PowerShell.",
+            "Spearheaded system and process improvements based on rigorous analysis."
+        ],
+        skills: ["PowerShell", "IT Infrastructure"],
+        color: "#FBC02D",
+        logo: cdgLogo
     }
+];
+
+export const education: Education[] = [
+    {
+        institution: "Singapore Management University",
+        degree: "BSc (Information Systems)",
+        location: "Singapore",
+        startDate: "2021-08",
+        endDate: "2025-08",
+        description: [
+            "Major in Digitalisation & Cloud Solutions"
+        ]
+    },
+    {
+        institution: "Anglo-Chinese Junior College",
+        degree: "GCE A-Levels",
+        location: "Singapore",
+        startDate: "2018-01",
+        endDate: "2019-12",
+        description: ["Physics, Chemistry, Mathematics, Economics"]
+    }
+];
+
+export const achievements = [
+    "1st in CFC Hackathon (https://bitly.ws/37EaK)"
 ];
 
 export const projects: Project[] = [
@@ -104,7 +226,7 @@ export const projects: Project[] = [
         id: "proj-esdeezknee",
         title: "ESDeezknee",
         description: "An immersive enterprise solution designed for theme parks to enhance visitor experiences. Features a microservices architecture handling ticketing, queues, and notifications.",
-        tags: ["Python", "Go", "Docker", "RabbitMQ", "Kong", "Stripe"],
+        tags: ["Python", "Docker", "RabbitMQ", "Kong", "Stripe"],
         github: "https://github.com/ESDeezknee/ESDeezknee",
         image: "https://user-images.githubusercontent.com/45414933/230269633-7ec3527b-85c3-4d05-822e-bc74c6fdbf35.gif",
         featured: true
@@ -148,8 +270,8 @@ export const projects: Project[] = [
     {
         id: "proj-personal-web",
         title: "Portfolio V2",
-        description: "You're looking at it! A high-performance portfolio built with Svelte 5 Runes and Tailwind v4, featuring 3D interactions and deep-linking.",
-        tags: ["Svelte 5", "Tailwind v4", "Vite"],
+        description: "You're looking at it! A high-performance portfolio built with Svelte 5 and Tailwind v4, featuring 3D interactions and deep-linking.",
+        tags: ["TypeScript", "Tailwind v4", "Vite"],
         github: "https://github.com/joelfatnugget/PersonalWeb",
         image: "https://placehold.co/600x400/0f172a/cbd5e1?text=Portfolio+V2",
         featured: false

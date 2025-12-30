@@ -6,7 +6,7 @@
     import { cubicOut } from 'svelte/easing';
 
     let filter = $state('All');
-    const categories = ['All', 'Svelte', 'React', 'Node.js', 'Rust', 'Python', 'Payments'];
+    const categories = ['All', 'React', 'Node.js', 'Rust', 'Python', 'Payments'];
 
     // Filter logic
     let filteredProjects = $derived(
