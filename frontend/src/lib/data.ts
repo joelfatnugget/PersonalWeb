@@ -106,9 +106,9 @@ export const experiences: Experience[] = [
         startDate: "2025-06",
         endDate: "Present",
         description: [
-            "Led end-to-end Generative AI app development, slashing test case creation from 8,000 to 50 man-hours (98% efficiency gain).",
-            "Built custom RAG pipeline with cutting-edge AI, enabling first live demo in 5 months from initial Git commit.",
-            "Automated GTLIG analysis via fullstack solution, revolutionizing manual workflows."
+            "Architected and deployed an end-to-end Generative AI testing suite using Python and React, automating the generation of complex test scenarios. This initiative reduced the manual effort for test case creation from 8,000 to just 50 man-hours, delivering a massive 98% efficiency gain for the QA team.",
+            "Designed and implemented a custom Retrieval-Augmented Generation (RAG) pipeline to query internal technical documentation. Integrated vector embeddings and LLMs to produce accurate context-aware responses, enabling the team to deliver a successful live product demo to stakeholders within 5 months.",
+            "Developed a full-stack dashboard to automate the analysis of GTLIG (Global Transaction Log) data. Replaced error-prone manual Excel workflows with a real-time visualization tool, significantly improving the speed and accuracy of transaction anomaly detection."
         ],
         skills: ["Python", "React", "TypeScript", "Docker"],
         color: "#1336CC",
@@ -122,9 +122,9 @@ export const experiences: Experience[] = [
         startDate: "2024-05",
         endDate: "2024-08",
         description: [
-            "Improved functionality and user experience of the customer-facing Visa Test Portal.",
-            "Ensured smooth product rollout by resolving over 9 critical bugs in one week.",
-            "Achieved 1st Place in the APAC Case Competition, collaborating with cross-functional teams."
+            "Enhanced the Visa Test Portal's frontend architecture using React and TypeScript, optimizing component rendering and state management to improve load times and overall user experience for external clients.",
+            "Played a critical role in the product release cycle by identifying, triaging, and resolving over 9 high-priority defects during the final UAT phase, ensuring a seamless production rollout without critical regressions.",
+            "Championed a fintech innovation proposal during the APAC Case Competition, leading a cross-functional team to develop a prototype that won 1st Place for its potential to drive new revenue streams."
         ],
         skills: ["React", "TypeScript", "Tailwind CSS"],
         color: "#1336CC",
@@ -138,9 +138,9 @@ export const experiences: Experience[] = [
         startDate: "2023-05",
         endDate: "2023-07",
         description: [
-            "Engineered automated patch deployment for Virtual Machines using Jenkins pipelines, reducing manual effort by ~70%.",
-            "Led evaluation of critical Proof of Concepts (JWT Caching, mTLS) for 10+ APIs across cloud infrastructure.",
-            "Authored comprehensive Cloud Operation Guidelines to standardize training and operational procedures."
+            "Engineered a robust automated patch management system for Azure Virtual Machines using Jenkins CI/CD pipelines and Shell scripting. This solution standardized the patching process and reduced monthly manual maintenance overhead by approximately 70%.",
+            "Conducted in-depth technical evaluations of security protocols including JWT Caching strategies and mTLS implementation for over 10 critical internal APIs. Produced detailed technical reports guiding the architectural decisions for the bank's cloud infrastructure.",
+            "Authored and maintained comprehensive Cloud Operation Guidelines and Standard Operating Procedures (SOPs), serving as the primary training resource for new hires and ensuring operational compliance across the engineering team."
         ],
         skills: ["Shell", "Python", "Azure"],
         color: "#A0D235",
@@ -154,9 +154,9 @@ export const experiences: Experience[] = [
         startDate: "2023-01",
         endDate: "2023-04",
         description: [
-            "Worked with regional management to shape Insight App capabilities and standards across APAC.",
-            "Translated high-level specifications into new/enhanced mobile application features.",
-            "Developed a Machine Learning Model to predict next quarter's sales."
+            "Collaborated directly with regional product managers to define the roadmap for the 'Insight App', translating business requirements into technical specifications for the APAC market expansion.",
+            "Implemented key mobile features using React Native, including interactive data visualizations and user preference modules, ensuring feature parity across both iOS and Android platforms.",
+            "Developed a predictive Machine Learning model using Python (Scikit-learn) to analyze historical sales data, providing leadership with actionable forecasts for the upcoming quarter's revenue performance."
         ],
         skills: ["Python", "React Native"],
         color: "#0099CD",
@@ -170,9 +170,9 @@ export const experiences: Experience[] = [
         startDate: "2021-12",
         endDate: "2022-12",
         description: [
-            "Led Quality Assurance and testing, identifying critical defects and sub-optimal UX issues.",
-            "Used network troubleshooting tools (Burp Suite) to intercept and analyze API traffic.",
-            "Resolved over 30 reported software bugs, improving application quality."
+            "Led the QA strategy for the mobile booking application, executing comprehensive test plans that identified critical UI/UX friction points and functional defects prior to public release.",
+            "Utilized advanced network analysis tools like Burp Suite to intercept and inspect API request/response payloads, enabling the backend team to pinpoint root causes of latency and data inconsistency issues.",
+            "Managed the defect lifecycle for over 30 reported bugs, working closely with developers to reproduce issues, verify fixes, and ensure high-quality software delivery."
         ],
         skills: ["Testing", "API Analysis"],
         color: "#FBC02D",
@@ -186,9 +186,9 @@ export const experiences: Experience[] = [
         startDate: "2021-02",
         endDate: "2021-07",
         description: [
-            "Optimized IT infrastructure through building and upgrading hardware/software.",
-            "Drove 70% efficiency gains by deploying an automated computer installation process using PowerShell.",
-            "Spearheaded system and process improvements based on rigorous analysis."
+            "Managed the end-to-end lifecycle of IT assets, performing hardware upgrades and software configurations to optimize workstation performance for corporate staff.",
+            "Revolutionized the workstation provisioning process by developing PowerShell automation scripts. This initiative reduced the setup time per machine by 70%, allowing the IT team to meet aggressive onboarding targets.",
+            "Spearheaded a department-wide initiative to analyze support ticket trends, implementing process improvements that reduced average resolution time and improved internal user satisfaction."
         ],
         skills: ["PowerShell", "IT Infrastructure"],
         color: "#FBC02D",
