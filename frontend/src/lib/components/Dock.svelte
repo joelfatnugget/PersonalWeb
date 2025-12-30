@@ -1,7 +1,7 @@
 <script lang="ts">
     import { socials } from '$lib/data';
     import Icon from '@iconify/svelte';
-    import { FileText, Home } from 'lucide-svelte';
+    import { FileText, Home, AppWindow } from 'lucide-svelte';
 
     let hoverIndex: number | null = $state(null);
 </script>
@@ -63,6 +63,22 @@
 
         <!-- Divider -->
         <div class="hidden md:block w-full h-px bg-surface-300 dark:bg-surface-700 my-1"></div>
+
+        <!-- Applications Shortcut -->
+        <a 
+            href="/applications"
+            class="relative p-3 rounded-xl bg-surface-200 dark:bg-surface-800 hover:bg-primary-500 hover:text-white transition-all duration-300 ease-out flex items-center justify-center group"
+            class:scale-125={hoverIndex === 98}
+            onmouseenter={() => hoverIndex = 98}
+            onmouseleave={() => hoverIndex = null}
+        >
+            <AppWindow class="size-6" />
+            <span class="
+                absolute bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none
+                -top-10 left-1/2 -translate-x-1/2
+                md:top-1/2 md:-translate-y-1/2 md:left-full md:ml-3 md:translate-x-0
+            ">Applications</span>
+        </a>
 
         <!-- Resume Shortcut -->
         <a 
