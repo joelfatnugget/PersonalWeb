@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import { Search, Sun, Moon, Command } from 'lucide-svelte';
+    import { Search, Sun, Moon, Command, ExternalLink } from 'lucide-svelte';
     import CommandPalette from './CommandPalette.svelte';
 
     const navLinks = [
         { href: '/', label: 'Home' },
         { href: '/experience', label: 'Experience' },
         { href: '/projects', label: 'Projects' },
+        { href: 'https://blog.joelfatnugget.xyz/', label: 'Blog', external: true },
         { href: '/applications', label: 'Applications' },
         { href: '/resume', label: 'Resume' },
     ];
@@ -56,9 +57,14 @@
                 {#each navLinks as link}
                     <a 
                         href={link.href} 
-                        class="text-sm font-medium transition-all duration-200 relative py-1 {$page.url.pathname === link.href ? 'text-primary-600 dark:text-primary-400 font-semibold' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white'}"
+                        target={link.external ? '_blank' : undefined}
+                        rel={link.external ? 'noopener noreferrer' : undefined}
+                        class="text-sm font-medium transition-all duration-200 relative py-1 flex items-center gap-1 {$page.url.pathname === link.href ? 'text-primary-600 dark:text-primary-400 font-semibold' : 'text-surface-600 dark:text-surface-300 hover:text-surface-900 dark:hover:text-white'}"
                     >
                         {link.label}
+                        {#if link.external}
+                            <ExternalLink class="size-3 text-surface-400" />
+                        {/if}
                         {#if $page.url.pathname === link.href}
                             <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full animate-in fade-in zoom-in-95 duration-200"></span>
                         {/if}

@@ -2,25 +2,16 @@
     import { 
         FileCode2, 
         ArrowRight, 
-        Sparkles, 
         Cpu, 
-        Layers, 
-        ArrowRightLeft, 
         CheckCircle2, 
-        Clock, 
-        KeyRound, 
-        Database, 
-        ShieldCheck, 
-        Search,
-        Binary,
-        Terminal
+        Search
     } from 'lucide-svelte';
-    import { fly, fade } from 'svelte/transition';
+    import { fly } from 'svelte/transition';
 
     let searchQuery = '';
     let selectedCategory = 'All';
 
-    const categories = ['All', 'Mainframe & Banking', 'Security & Protocols', 'Data Translators'];
+    const categories = ['All', 'Mainframe & Banking'];
 
     const applications = [
         {
@@ -35,71 +26,6 @@
             category: 'Mainframe & Banking',
             badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
             tags: ['IBM EBCDIC', 'BER-TLV', 'EMV ISO-7816', 'Mainframe']
-        },
-        {
-            id: 'iso-8583',
-            title: 'ISO 8583 Financial Message Parser',
-            subtitle: 'Bitmap & Data Element (DE 1-128) Analyzer',
-            description: 'Deconstruct financial transaction messages into MTI, primary/secondary bitmaps, and individual data elements with custom field length unpackers.',
-            icon: Terminal,
-            path: '/applications/iso-8583',
-            status: 'Coming Soon',
-            isLive: false,
-            category: 'Mainframe & Banking',
-            badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-            tags: ['ISO 8583', 'Payment Systems', 'Bitmap Parsing', 'MTI']
-        },
-        {
-            id: 'comp3-converter',
-            title: 'Mainframe Packed Decimal (COMP-3)',
-            subtitle: 'COBOL EBCDIC Packed Numeric Converter',
-            description: 'Convert raw COBOL COMP-3 packed decimal bytes to readable numeric values and sign nibbles (+/C, -/D, F).',
-            icon: Binary,
-            path: '/applications/comp3',
-            status: 'Coming Soon',
-            isLive: false,
-            category: 'Mainframe & Banking',
-            badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-            tags: ['COBOL COMP-3', 'Packed Decimal', 'Mainframe']
-        },
-        {
-            id: 'emv-crypto',
-            title: 'EMV Cryptogram & Cert Inspector',
-            subtitle: 'ARQC / ARPC & RSA Public Key Auditor',
-            description: 'Inspect Chip Card cryptograms, verify RSA Public Key certificates, and analyze Issuer Application Data (IAD) fields.',
-            icon: ShieldCheck,
-            path: '/applications/emv-crypto',
-            status: 'In Showcase',
-            isLive: false,
-            category: 'Security & Protocols',
-            badgeColor: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
-            tags: ['EMV Chip', 'ARQC', 'RSA Public Key', 'Payment Security']
-        },
-        {
-            id: 'jwt-suite',
-            title: 'JWT & OAuth Token Security Suite',
-            subtitle: 'Claims Decoder & Signature Verification Tool',
-            description: 'Decode header, payload, and signature components of JWTs with expiration checking and algorithm validation.',
-            icon: KeyRound,
-            path: '/applications/jwt-suite',
-            status: 'In Showcase',
-            isLive: false,
-            category: 'Security & Protocols',
-            badgeColor: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
-            tags: ['JWT', 'OAuth 2.0', 'HMAC / RSA', 'Auth Security']
-        },
-        {
-            id: 'payload-mock',
-            title: 'Banking API Payload Inspector',
-            subtitle: 'JSON & XML Schema Validator for Financial APIs',
-            description: 'Simulate, validate, and transform ISO 20022 and RESTful payment API request/response payloads.',
-            icon: Database,
-            path: '/applications/payload-mock',
-            status: 'In Showcase',
-            isLive: false,
-            category: 'Data Translators',
-            badgeColor: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20',
-            tags: ['ISO 20022', 'REST API', 'JSON Schema', 'Payment Gateway']
         }
     ];
 
@@ -177,11 +103,7 @@
                             <svelte:component this={app.icon} class="size-7" />
                         </div>
                         <span class="px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 {app.badgeColor}">
-                            {#if app.isLive}
-                                <CheckCircle2 class="size-3.5" />
-                            {:else}
-                                <Clock class="size-3.5" />
-                            {/if}
+                            <CheckCircle2 class="size-3.5" />
                             {app.status}
                         </span>
                     </div>
@@ -209,23 +131,13 @@
                 </div>
 
                 <div class="pt-6 mt-4 border-t border-surface-200/60 dark:border-surface-700/50">
-                    {#if app.isLive}
-                        <a 
-                            href={app.path} 
-                            class="btn variant-filled-primary w-full group/btn font-semibold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20"
-                        >
-                            <span>Launch Application</span>
-                            <ArrowRight class="size-4 transition-transform group-hover/btn:translate-x-1" />
-                        </a>
-                    {:else}
-                        <button 
-                            disabled
-                            class="btn variant-soft-surface w-full font-medium text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 cursor-not-allowed opacity-75"
-                        >
-                            <Clock class="size-4" />
-                            <span>In Development</span>
-                        </button>
-                    {/if}
+                    <a 
+                        href={app.path} 
+                        class="btn variant-filled-primary w-full group/btn font-semibold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20"
+                    >
+                        <span>Launch Application</span>
+                        <ArrowRight class="size-4 transition-transform group-hover/btn:translate-x-1" />
+                    </a>
                 </div>
             </div>
         {/each}

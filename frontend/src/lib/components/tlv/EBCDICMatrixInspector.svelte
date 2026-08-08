@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getCodePageTable, CODE_PAGES, type SupportedCodePage, type CodePageByteEntry } from '$lib/tlv/ebcdic';
+    import { getCodePageTable, CODE_PAGES, type SupportedCodePage, type CodePageByteEntry, type CodePageInfo } from '$lib/tlv/ebcdic';
     import { Search, Info, Check, Copy, Grid, ArrowRightLeft } from 'lucide-svelte';
 
     export let selectedCodePage: SupportedCodePage = 'IBM1047';
@@ -10,6 +10,7 @@
 
     $: table = getCodePageTable(selectedCodePage);
     $: compareTable = getCodePageTable(compareCodePage);
+    $: currentCodePageInfo = CODE_PAGES.find(cp => cp.id === selectedCodePage) as CodePageInfo | undefined;
 
     $: filteredTable = table.filter(entry => {
         if (!searchQuery) return true;
@@ -42,6 +43,9 @@
             <h3 class="text-sm font-semibold uppercase tracking-wider text-surface-500 dark:text-surface-400 flex items-center gap-2">
                 <Grid class="size-4 text-primary-500" />
                 256-Byte Character Set Matrix ({selectedCodePage})
+                {#if currentCodePageInfo?.isMultiByte}
+                    <span class="text-xs font-normal text-rose-500 ml-1">[Multi-Byte]</span>
+                {/if}
             </h3>
             <p class="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
                 Click any byte cell in the grid to inspect its decimal, binary, and cross-code-page character mappings.

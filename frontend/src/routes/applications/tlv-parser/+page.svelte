@@ -117,6 +117,11 @@
             name: 'IBM Mainframe Cardholder Info',
             hex: '5F200EE5C9E2C140C3D9C5D4C9E340F19F1A020840',
             desc: 'EBCDIC Cardholder Name ("VISA CREDIT 1") & Country Code'
+        },
+        {
+            name: 'IBM943 Japanese (Shift-JIS)',
+            hex: '500A82B182F182C982BF82CD9F1A020392',
+            desc: 'Shift-JIS encoded "\u3053\u3093\u306b\u3061\u306f" (Konnichiwa) + Country Code Japan (0392). Select IBM943 code page first.'
         }
     ];
 

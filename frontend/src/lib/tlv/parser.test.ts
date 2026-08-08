@@ -84,4 +84,14 @@ describe('TLV Parser & Encoder', () => {
         expect(nodes[0].length).toBe(128);
         expect(nodes[0].valueHex.length).toBe(256); // 128 bytes = 256 hex chars
     });
+
+    it('parses TLV with IBM943 encoding and decodes Japanese literal values', () => {
+        const hex = '500682B182F182C9';
+        const nodes = parseTLV(hex, { encoding: 'IBM943' });
+
+        expect(nodes).toHaveLength(1);
+        expect(nodes[0].tag).toBe('50');
+        expect(nodes[0].length).toBe(6);
+        expect(nodes[0].literalValue).toBe('こんに');
+    });
 });

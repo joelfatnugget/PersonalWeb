@@ -30,6 +30,13 @@ A rich set of icons to enhance visual communication:
 - **Responsive Design:** Optimized for all devices, from mobile to ultra-wide monitors.
 - **Accessibility (A11y):** Ensuring the site is usable for everyone.
 
+## 📚 Documentation & Developer Suite Roadmap
+- **[Applications Architecture & Roadmap](documentation/FRONTEND_APPLICATIONS_ROADMAP.md)**: Specifications for client-side developer utilities, protocols, and planned tools.
+
 ## 🛠 Setup & Development
 
-(Instructions will be added as the project progresses)
+```bash
+cd frontend
+npm install
+npm run dev
+```

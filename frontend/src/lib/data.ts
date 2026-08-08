@@ -50,6 +50,23 @@ export interface Social {
     icon: string; // Iconify string
 }
 
+export interface BlogPostPreview {
+    title: string;
+    excerpt: string;
+    tag: string;
+    readTime: string;
+    url: string;
+}
+
+export interface BlogSpotlight {
+    title: string;
+    subtitle: string;
+    description: string;
+    url: string;
+    featuredPosts: BlogPostPreview[];
+    topics: string[];
+}
+
 // --- Data ---
 
 export const personalInfo = {
@@ -220,6 +237,7 @@ export const projects: Project[] = [
         title: "Lessons To Payment",
         description: "A deep-dive technical blog exploring the inner workings of the payments industry, from ISO8583 standards to fraud scoring and message routing.",
         tags: ["Payments", "ISO8583", "FinTech", "Technical Writing"],
+        link: "https://blog.joelfatnugget.xyz/",
         github: "https://github.com/joelfatnugget/LessonsToPayment",
         image: "https://raw.githubusercontent.com/joelfatnugget/LessonsToPayment/main/gif.gif",
         featured: true
@@ -245,7 +263,46 @@ export const projects: Project[] = [
 ];
 
 export const socials: Social[] = [
+    { platform: "Blog", url: "https://blog.joelfatnugget.xyz/", icon: "lucide:newspaper" },
     { platform: "GitHub", url: "https://github.com/joelfatnugget", icon: "simple-icons:github" },
     { platform: "LinkedIn", url: "https://www.linkedin.com/in/joeltanec/", icon: "simple-icons:linkedin" },
     { platform: "Email", url: "mailto:joeltanec@gmail.com", icon: "mdi:email" }
 ];
+
+export const blogSpotlight: BlogSpotlight = {
+    title: "Lessons To Payment & Engineering Blog",
+    subtitle: "In-Depth Technical Essays & System Architecture Insights",
+    description: "Deep-dive technical writing breaking down complex domain knowledge—from payment processing protocols (ISO8583) and real-time fraud risk scoring to payment routing and hardware security.",
+    url: "https://blog.joelfatnugget.xyz/",
+    featuredPosts: [
+        {
+            title: "Day 9: Message Routing (in Payments Network)",
+            excerpt: "How payment messages navigate from terminal to acquirer, scheme switch, and issuing bank.",
+            tag: "Payment Architecture",
+            readTime: "3 min read",
+            url: "https://blog.joelfatnugget.xyz/blog/lessons-to-payment-day-9-message-routing/"
+        },
+        {
+            title: "Day 8: EMV vs MagStripe",
+            excerpt: "Understanding EMV microchip dynamic cryptograms, magnetic stripe skimming vulnerabilities, and the 2015 liability shift.",
+            tag: "Security & Risk",
+            readTime: "4 min read",
+            url: "https://blog.joelfatnugget.xyz/blog/lessons-to-payment-day-8-emv-vs-magstripe/"
+        },
+        {
+            title: "Day 7: Fraud Checks & Risk Scoring",
+            excerpt: "Fraud detection in ISO8583 messages: Visa Advance Authorisation (VAA), Visa Risk Manager (VRM), and Mastercard Decision Intelligence.",
+            tag: "Security & Risk",
+            readTime: "5 min read",
+            url: "https://blog.joelfatnugget.xyz/blog/lessons-to-payment-day-7-fraud-checks-risk-scoring/"
+        },
+        {
+            title: "Day 2: 4 Party Model",
+            excerpt: "Understanding the 4 Party Model with the Ya Kun coffee analogy: Cardholder, Merchant, Acquirer, and Issuer.",
+            tag: "Payment Architecture",
+            readTime: "3 min read",
+            url: "https://blog.joelfatnugget.xyz/blog/lessons-to-payment-day-2-four-party-model/"
+        }
+    ],
+    topics: ["ISO8583", "Payment Architecture", "Security & Risk", "EMV", "Visa VAA", "Message Routing"]
+};

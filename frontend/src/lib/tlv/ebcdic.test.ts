@@ -85,4 +85,52 @@ describe('IBM Character Set (EBCDIC) Converter', () => {
         expect(table[0xC1].binary).toBe('11000001');
         expect(table[0xF0].char).toBe('0');
     });
+
+    it('includes IBM943 in supported code pages list', () => {
+        const codePages = getSupportedCodePages();
+        expect(codePages.some(cp => cp.id === 'IBM943')).toBe(true);
+    });
+
+    it('decodes IBM943 (Shift-JIS) single-byte ASCII range correctly', () => {
+        const hex = '48454C4C4F';
+        const literal = ebcdicToLiteral(hex, 'IBM943');
+        expect(literal).toBe('HELLO');
+    });
+
+    it('decodes IBM943 (Shift-JIS) multi-byte Japanese characters correctly', () => {
+        const hex = '82B182F1';
+        const literal = ebcdicToLiteral(hex, 'IBM943');
+        expect(literal).toBe('こん');
+    });
+
+    it('decodes IBM943 (Shift-JIS) mixed ASCII and Japanese correctly', () => {
+        const hex = '48454C4C4F82B182F1';
+        const literal = ebcdicToLiteral(hex, 'IBM943');
+        expect(literal).toBe('HELLOこん');
+    });
+
+    it('encodes literal text to IBM943 (Shift-JIS) hex correctly', () => {
+        const text = 'HELLO';
+        const hex = literalToEbcdic(text, 'IBM943');
+        expect(hex.toUpperCase()).toBe('48454C4C4F');
+    });
+
+    it('encodes Japanese text to IBM943 hex correctly', () => {
+        const text = 'こん';
+        const hex = literalToEbcdic(text, 'IBM943');
+        expect(hex.toUpperCase()).toBe('82B182F1');
+    });
+
+    it('performs bidirectional IBM943 conversion for mixed content', () => {
+        const sampleText = 'HELLOこん';
+        const hex = literalToEbcdic(sampleText, 'IBM943');
+        const decoded = ebcdicToLiteral(hex, 'IBM943');
+        expect(decoded).toBe(sampleText);
+    });
+
+    it('returns code page table for IBM943 with isMultiByte flag', () => {
+        const table = getCodePageTable('IBM943');
+        expect(table).toHaveLength(256);
+        expect(table[0x41].char).toBe('A');
+    });
 });

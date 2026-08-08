@@ -3,6 +3,7 @@ export interface CodePageInfo {
     name: string;
     region: string;
     description: string;
+    isMultiByte?: boolean;
 }
 
 export interface CodePageByteEntry {
@@ -26,6 +27,7 @@ export type SupportedCodePage =
     | 'IBM285' 
     | 'IBM297' 
     | 'IBM870' 
+    | 'IBM943' 
     | 'ASCII';
 
 export const CODE_PAGES: CodePageInfo[] = [
@@ -40,6 +42,7 @@ export const CODE_PAGES: CodePageInfo[] = [
     { id: 'IBM285', name: 'IBM Code Page 285', region: 'United Kingdom', description: 'UK EBCDIC with Pound (£) sign' },
     { id: 'IBM297', name: 'IBM Code Page 297', region: 'France', description: 'French EBCDIC' },
     { id: 'IBM870', name: 'IBM Code Page 870', region: 'Central Europe', description: 'Latin-2 Central European EBCDIC' },
+    { id: 'IBM943', name: 'IBM Code Page 943', region: 'Japan', description: 'Japanese Shift-JIS (IBM variant of CP932)', isMultiByte: true },
     { id: 'ASCII', name: 'ASCII / UTF-8', region: 'Universal', description: 'Standard ASCII (ISO-8859-1 / UTF-8)' },
 ];
 
@@ -212,6 +215,11 @@ export function ebcdicToLiteral(hex: string, codePage: SupportedCodePage = 'IBM1
         return decoder.decode(bytes);
     }
 
+    if (codePage === 'IBM943') {
+        const decoder = new TextDecoder('shift-jis');
+        return decoder.decode(bytes);
+    }
+
     const map = EBCDIC_MAPS[codePage] || EBCDIC_MAPS.IBM1047;
     let result = '';
     for (let i = 0; i < bytes.length; i++) {
@@ -225,11 +233,80 @@ export function ebcdicToLiteral(hex: string, codePage: SupportedCodePage = 'IBM1
     return result;
 }
 
+// Lazily built reverse mapping: Unicode char -> Shift-JIS byte sequence
+let shiftJisReverseMap: Map<string, Uint8Array> | null = null;
+
+function getShiftJisReverseMap(): Map<string, Uint8Array> {
+    if (shiftJisReverseMap) return shiftJisReverseMap;
+
+    const decoder = new TextDecoder('shift-jis');
+    const map = new Map<string, Uint8Array>();
+
+    // Single-byte range: 0x00-0x7F (ASCII compatible) and 0xA1-0xDF (half-width Katakana)
+    for (let b = 0x20; b <= 0x7E; b++) {
+        const char = decoder.decode(new Uint8Array([b]));
+        if (char && char !== '\uFFFD') {
+            map.set(char, new Uint8Array([b]));
+        }
+    }
+    for (let b = 0xA1; b <= 0xDF; b++) {
+        const char = decoder.decode(new Uint8Array([b]));
+        if (char && char !== '\uFFFD') {
+            map.set(char, new Uint8Array([b]));
+        }
+    }
+
+    // Double-byte range: lead 0x81-0x9F and 0xE0-0xFC, trail 0x40-0x7E and 0x80-0xFC
+    const leadRanges = [[0x81, 0x9F], [0xE0, 0xFC]];
+    const trailRanges = [[0x40, 0x7E], [0x80, 0xFC]];
+
+    for (const [leadStart, leadEnd] of leadRanges) {
+        for (let lead = leadStart; lead <= leadEnd; lead++) {
+            for (const [trailStart, trailEnd] of trailRanges) {
+                for (let trail = trailStart; trail <= trailEnd; trail++) {
+                    const bytes = new Uint8Array([lead, trail]);
+                    const char = decoder.decode(bytes);
+                    if (char && char !== '\uFFFD' && char.length === 1 && !map.has(char)) {
+                        map.set(char, bytes);
+                    }
+                }
+            }
+        }
+    }
+
+    shiftJisReverseMap = map;
+    return map;
+}
+
 export function literalToEbcdic(text: string, codePage: SupportedCodePage = 'IBM1047'): string {
     if (codePage === 'ASCII') {
         const encoder = new TextEncoder();
         const bytes = encoder.encode(text);
         return bytesToHex(bytes);
+    }
+
+    if (codePage === 'IBM943') {
+        const reverseMap = getShiftJisReverseMap();
+        const byteArrays: Uint8Array[] = [];
+
+        for (const char of text) {
+            const encoded = reverseMap.get(char);
+            if (encoded) {
+                byteArrays.push(encoded);
+            } else {
+                // Fallback: encode as ASCII space (0x20) for unmappable characters
+                byteArrays.push(new Uint8Array([0x20]));
+            }
+        }
+
+        const totalLength = byteArrays.reduce((sum, arr) => sum + arr.length, 0);
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const arr of byteArrays) {
+            result.set(arr, offset);
+            offset += arr.length;
+        }
+        return bytesToHex(result);
     }
 
     const rev = getReverseMap(codePage);
@@ -245,6 +322,11 @@ export function literalToEbcdic(text: string, codePage: SupportedCodePage = 'IBM
         }
     }
     return bytesToHex(bytes);
+}
+
+// Shift-JIS lead byte ranges indicate the start of a 2-byte sequence
+function isShiftJisLeadByte(b: number): boolean {
+    return (b >= 0x81 && b <= 0x9F) || (b >= 0xE0 && b <= 0xFC);
 }
 
 export function getCodePageTable(codePage: SupportedCodePage = 'IBM1047'): CodePageByteEntry[] {
@@ -266,6 +348,43 @@ export function getCodePageTable(codePage: SupportedCodePage = 'IBM1047'): CodeP
                 binary: i.toString(2).padStart(8, '0'),
                 char: (i < 32 || i === 127) ? (mnemonic || '.') : char,
                 mnemonic,
+                category
+            });
+        }
+        return entries;
+    }
+
+    if (codePage === 'IBM943') {
+        const decoder = new TextDecoder('shift-jis');
+        for (let i = 0; i < 256; i++) {
+            const mnemonic = ASCII_MNEMONICS[i];
+            let char: string;
+            let category: CodePageByteEntry['category'] = 'symbol';
+
+            if (i < 0x20 || i === 0x7F) {
+                category = 'control';
+                char = mnemonic || '.';
+            } else if (i === 0x20) {
+                category = 'space';
+                char = ' ';
+            } else if (isShiftJisLeadByte(i)) {
+                // Lead bytes for double-byte sequences are displayed as a marker
+                category = 'control';
+                char = 'LB';
+            } else {
+                const decoded = decoder.decode(new Uint8Array([i]));
+                char = (decoded === '\uFFFD') ? '.' : decoded;
+                if (/[0-9]/.test(char)) category = 'digit';
+                else if (/[a-zA-Z]/.test(char)) category = 'letter';
+                else if (char === ' ') category = 'space';
+            }
+
+            entries.push({
+                dec: i,
+                hex: i.toString(16).padStart(2, '0').toUpperCase(),
+                binary: i.toString(2).padStart(8, '0'),
+                char,
+                mnemonic: isShiftJisLeadByte(i) ? 'LB' : mnemonic,
                 category
             });
         }

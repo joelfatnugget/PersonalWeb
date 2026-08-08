@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { personalInfo, skills, projects, experiences } from '$lib/data';
+    import { personalInfo, skills, projects, experiences, blogSpotlight } from '$lib/data';
     import { calculateStaggerDelay } from '$lib/utils';
     import Icon from '@iconify/svelte';
     import { 
@@ -13,7 +13,10 @@
         Layers, 
         ExternalLink,
         CheckCircle2,
-        FolderGit2
+        FolderGit2,
+        BookOpen,
+        ArrowUpRight,
+        Clock
     } from 'lucide-svelte';
     import BloodDrive from '$lib/components/BloodDrive.svelte';
 
@@ -44,6 +47,7 @@
     }
 
     const featuredProjects = projects.filter(p => p.featured).slice(0, 2);
+    let displayBlogPosts = $derived(data?.blogPosts && data.blogPosts.length > 0 ? data.blogPosts.slice(0, 4) : blogSpotlight.featuredPosts);
 </script>
 
 <div class="relative overflow-hidden min-h-screen">
@@ -97,6 +101,16 @@
             >
                 Explore Projects
                 <ArrowRight class="ml-2 size-5 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+
+            <a 
+                href="https://blog.joelfatnugget.xyz/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group inline-flex items-center justify-center px-8 py-3.5 text-base font-bold transition-all duration-300 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border border-surface-200 dark:border-surface-800 rounded-2xl hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-900 dark:text-white hover:scale-105 shadow-sm"
+            >
+                Read Blog
+                <BookOpen class="ml-2 size-4 text-primary-500" />
             </a>
             
             <a 
@@ -245,6 +259,88 @@
                 <p class="text-xs text-surface-600 dark:text-surface-400 leading-relaxed">
                     CI/CD automated patch management pipelines for SMBC enterprise servers.
                 </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURED TECHNICAL BLOG SPOTLIGHT (RECRUITER HIGHLIGHT) -->
+    <section class="container mx-auto px-4 py-16 max-w-5xl relative z-10">
+        <div 
+            use:scrollReveal={{ delay: 0 }}
+            class="motion-item fade-up p-8 md:p-12 rounded-3xl bg-gradient-to-br from-surface-900/95 via-surface-900/90 to-black text-white border border-primary-500/30 shadow-2xl relative overflow-hidden group"
+        >
+            <!-- Ambient Glow -->
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-primary-500/30 transition-all duration-700"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-tertiary-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-8">
+                <!-- Section Badge & Header Button -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-500/20 text-primary-300 text-xs font-semibold uppercase tracking-widest border border-primary-500/30 shadow-sm">
+                        <BookOpen class="size-4 text-primary-400" /> Featured Technical Writing
+                    </div>
+                    <a 
+                        href={blogSpotlight.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-primary-500/25 hover:scale-105 transition-all w-fit"
+                    >
+                        Visit blog.joelfatnugget.xyz
+                        <ArrowUpRight class="size-4" />
+                    </a>
+                </div>
+
+                <!-- Main Headline & Description -->
+                <div class="space-y-3 max-w-3xl">
+                    <h2 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+                        {blogSpotlight.title}
+                    </h2>
+                    <p class="text-surface-300 text-sm sm:text-base leading-relaxed">
+                        {blogSpotlight.description}
+                    </p>
+                </div>
+
+                <!-- Topic Pills -->
+                <div class="flex flex-wrap gap-2 pt-2">
+                    {#each blogSpotlight.topics as topic}
+                        <span class="px-3 py-1 rounded-full bg-surface-800/80 text-surface-200 text-xs font-medium border border-surface-700">
+                            #{topic}
+                        </span>
+                    {/each}
+                </div>
+
+                <!-- Featured Article Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+                    {#each displayBlogPosts as post, i}
+                        <a 
+                            href={post.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="p-5 rounded-2xl bg-surface-800/60 backdrop-blur-md border border-surface-700/80 hover:border-primary-500/60 hover:bg-surface-800 transition-all duration-300 flex flex-col justify-between group/card space-y-4"
+                        >
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-xs text-surface-400">
+                                    <span class="px-2 py-0.5 rounded bg-primary-500/20 text-primary-300 font-semibold text-[10px]">
+                                        {post.tag}
+                                    </span>
+                                    <span class="flex items-center gap-1 text-[11px]">
+                                        <Clock class="size-3 text-surface-400" /> {post.readTime}
+                                    </span>
+                                </div>
+                                <h3 class="font-bold text-sm text-white group-hover/card:text-primary-400 transition-colors line-clamp-2">
+                                    {post.title}
+                                </h3>
+                                <p class="text-xs text-surface-300 line-clamp-3 leading-relaxed">
+                                    {post.excerpt}
+                                </p>
+                            </div>
+
+                            <div class="inline-flex items-center gap-1 text-xs font-bold text-primary-400 group-hover/card:translate-x-1 transition-transform pt-2">
+                                Read Article <ArrowRight class="size-3.5" />
+                            </div>
+                        </a>
+                    {/each}
+                </div>
             </div>
         </div>
     </section>

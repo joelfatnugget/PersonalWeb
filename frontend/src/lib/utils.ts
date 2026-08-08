@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { Project, Experience } from "./data";
+import type { Project, Experience, BlogPostPreview } from "./data";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -86,6 +86,7 @@ export function searchPortfolio(query: string, experiences: Experience[] = [], p
     // Static pages
     const pages = [
         { id: 'page-home', title: 'Home', description: 'Landing page and overview', type: 'page' as const, url: '/' },
+        { id: 'page-blog', title: 'Blog', description: 'Technical blog & insights at blog.joelfatnugget.xyz', type: 'page' as const, url: 'https://blog.joelfatnugget.xyz/' },
         { id: 'page-experience', title: 'Experience', description: 'Career timeline & work history', type: 'page' as const, url: '/experience' },
         { id: 'page-projects', title: 'Projects', description: 'Featured work & bento gallery', type: 'page' as const, url: '/projects' },
         { id: 'page-resume', title: 'Resume', description: 'Web-native interactive resume', type: 'page' as const, url: '/resume' },
@@ -136,4 +137,54 @@ export function searchPortfolio(query: string, experiences: Experience[] = [], p
     }
 
     return results;
+}
+
+export function parseBlogRss(rssXml: string): (BlogPostPreview & { pubDate?: string })[] {
+    if (!rssXml || typeof rssXml !== 'string') return [];
+
+    const items: (BlogPostPreview & { pubDate?: string })[] = [];
+    const itemMatches = rssXml.match(/<item>[\s\S]*?<\/item>/gi);
+    if (!itemMatches) return [];
+
+    for (const itemXml of itemMatches) {
+        const titleMatch = itemXml.match(/<title>([\s\S]*?)<\/title>/i);
+        const linkMatch = itemXml.match(/<link>([\s\S]*?)<\/link>/i);
+        const descMatch = itemXml.match(/<description>([\s\S]*?)<\/description>/i);
+        const pubDateMatch = itemXml.match(/<pubDate>([\s\S]*?)<\/pubDate>/i);
+
+        if (!titleMatch || !linkMatch) continue;
+
+        const rawTitle = titleMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim();
+        const rawLink = linkMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim();
+        const rawDesc = descMatch ? descMatch[1].replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').replace(/<[^>]*>/g, '').trim() : '';
+        const rawPubDate = pubDateMatch ? pubDateMatch[1].trim() : '';
+
+        const wordCount = rawDesc.split(/\s+/).filter(Boolean).length;
+        const readTime = `${Math.max(2, Math.ceil(wordCount / 40))} min read`;
+
+        let tag = "Technical Blog";
+        const titleLower = rawTitle.toLowerCase();
+        if (titleLower.includes("routing") || titleLower.includes("model") || titleLower.includes("acquirer")) {
+            tag = "Payment Architecture";
+        } else if (titleLower.includes("fraud") || titleLower.includes("emv") || titleLower.includes("pan") || titleLower.includes("security")) {
+            tag = "Security & Risk";
+        } else if (titleLower.includes("iso8583") || titleLower.includes("de4") || titleLower.includes("de7") || titleLower.includes("message")) {
+            tag = "ISO 8583 & Messaging";
+        }
+
+        items.push({
+            title: rawTitle,
+            excerpt: rawDesc,
+            tag,
+            readTime,
+            url: rawLink,
+            pubDate: rawPubDate
+        });
+    }
+
+    return items.sort((a, b) => {
+        const dateA = a.pubDate ? new Date(a.pubDate).getTime() : 0;
+        const dateB = b.pubDate ? new Date(b.pubDate).getTime() : 0;
+        return dateB - dateA;
+    });
 }

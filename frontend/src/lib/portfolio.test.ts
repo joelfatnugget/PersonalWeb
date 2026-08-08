@@ -124,9 +124,91 @@ describe('Portfolio Utility Functions', () => {
             expect(results.some(r => r.title.includes('Visa'))).toBe(true);
         });
 
+        it('returns blog link when searching for blog', () => {
+            const results = searchPortfolio('blog', mockExperiences, mockProjects);
+            expect(results.some(r => r.url === 'https://blog.joelfatnugget.xyz/')).toBe(true);
+        });
+
         it('returns empty list for non-matching query', () => {
             const results = searchPortfolio('NonExistentQuery123', mockExperiences, mockProjects);
             expect(results).toHaveLength(0);
+        });
+    });
+
+    describe('Blog Data Integration', () => {
+        it('includes Blog in social links with correct URL', async () => {
+            const { socials } = await import('./data');
+            const blogSocial = socials.find(s => s.platform.toLowerCase() === 'blog');
+            expect(blogSocial).toBeDefined();
+            expect(blogSocial?.url).toBe('https://blog.joelfatnugget.xyz/');
+        });
+
+        it('ensures all social links have valid icon and platform attributes', async () => {
+            const { socials } = await import('./data');
+            for (const social of socials) {
+                expect(social.platform).toBeTruthy();
+                expect(social.icon).toBeTruthy();
+                expect(social.url).toBeTruthy();
+            }
+        });
+
+        it('includes blog link for Lessons To Payment project', async () => {
+            const { projects } = await import('./data');
+            const paymentBlogProject = projects.find(p => p.id === 'proj-lessons-to-payment');
+            expect(paymentBlogProject).toBeDefined();
+            expect(paymentBlogProject?.link).toBe('https://blog.joelfatnugget.xyz/');
+        });
+
+        it('exports blogSpotlight data with valid blog URL and topics', async () => {
+            const { blogSpotlight } = await import('./data');
+            expect(blogSpotlight).toBeDefined();
+            expect(blogSpotlight.url).toBe('https://blog.joelfatnugget.xyz/');
+            expect(blogSpotlight.topics.length).toBeGreaterThan(0);
+            expect(blogSpotlight.featuredPosts.some(p => p.url.includes('/blog/lessons-to-payment'))).toBe(true);
+        });
+    });
+
+    describe('parseBlogRss', () => {
+        const sampleXml = `<?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+            <channel>
+                <title>Test Blog</title>
+                <item>
+                    <title>Day 1: Test Article</title>
+                    <link>https://blog.joelfatnugget.xyz/blog/day-1</link>
+                    <description>Sample description for day 1</description>
+                    <pubDate>Mon, 20 Jul 2026 00:00:00 GMT</pubDate>
+                </item>
+                <item>
+                    <title>Day 9: Message Routing</title>
+                    <link>https://blog.joelfatnugget.xyz/blog/day-9</link>
+                    <description>Sample description for day 9 message routing</description>
+                    <pubDate>Tue, 28 Jul 2026 00:00:00 GMT</pubDate>
+                </item>
+            </channel>
+        </rss>`;
+
+        it('parses RSS XML and orders articles descending by pubDate', async () => {
+            const { parseBlogRss } = await import('./utils');
+            const posts = parseBlogRss(sampleXml);
+            expect(posts).toHaveLength(2);
+            expect(posts[0].title).toBe('Day 9: Message Routing');
+            expect(posts[0].url).toBe('https://blog.joelfatnugget.xyz/blog/day-9');
+            expect(posts[1].title).toBe('Day 1: Test Article');
+        });
+
+        it('handles malformed or empty RSS XML gracefully', async () => {
+            const { parseBlogRss } = await import('./utils');
+            expect(parseBlogRss('')).toEqual([]);
+            expect(parseBlogRss('<invalid>xml</invalid>')).toEqual([]);
+        });
+    });
+
+    describe('Applications Hub', () => {
+        it('includes Applications search result in searchPortfolio', async () => {
+            const { searchPortfolio } = await import('./utils');
+            const results = searchPortfolio('Applications');
+            expect(results.some(r => r.id === 'page-applications')).toBe(true);
         });
     });
 

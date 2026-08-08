@@ -68,7 +68,11 @@
     function navigate(url: string) {
         open = false;
         query = '';
-        goto(url);
+        if (url.startsWith('http')) {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+            goto(url);
+        }
     }
 
     onMount(() => {
@@ -175,6 +179,16 @@
                         >
                             <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Go to Experience</span>
                             <span class="text-xs text-surface-400 font-mono">/experience</span>
+                        </button>
+                        <button 
+                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
+                            onclick={() => navigate('https://blog.joelfatnugget.xyz/')}
+                        >
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Visit Technical Blog</span>
+                                <ExternalLink class="size-3 text-primary-500" />
+                            </div>
+                            <span class="text-xs text-surface-400 font-mono">blog.joelfatnugget.xyz</span>
                         </button>
                         <button 
                             class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
