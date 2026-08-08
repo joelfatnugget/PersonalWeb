@@ -1,10 +1,7 @@
 <script lang="ts">
-    import { personalInfo, experiences, skills, education, achievements } from '$lib/data';
+    import { personalInfo, experiences, education, achievements } from '$lib/data';
     import { formatDate } from '$lib/utils';
     import { Printer, ExternalLink } from 'lucide-svelte';
-    
-    // Helper to format skills as a comma-separated string for the "Proficient in..." line
-    const skillList = skills.map(s => s.name).join(', ');
 </script>
 
 <div class="container mx-auto px-4 py-12 flex flex-col items-center">
@@ -13,7 +10,7 @@
     <div class="w-full max-w-[210mm] flex justify-end mb-4 no-print">
         <a href="/Joel_Tan_Resume.pdf" target="_blank" class="btn variant-filled-primary">
             <Printer class="mr-2 size-4" />
-            Print / PDF
+            Print / Download PDF
         </a>
     </div>
 
@@ -23,14 +20,14 @@
         <!-- Header -->
         <header class="text-center mb-6 border-b-2 border-black pb-2">
             <h1 class="text-3xl font-bold uppercase tracking-wide mb-1">{personalInfo.name}</h1>
-            <div class="flex flex-wrap justify-center gap-1 text-sm text-black font-medium">
-                <span>+65 90605085</span> <!-- Hardcoded from Resume context as it's not in personalInfo object -->
+            <div class="flex flex-wrap justify-center gap-1.5 text-sm text-black font-medium">
+                <span>{personalInfo.phone}</span>
                 <span>|</span>
                 <a href="mailto:{personalInfo.email}" class="hover:underline">{personalInfo.email}</a>
                 <span>|</span>
-                <a href={personalInfo.url || '#'} class="hover:underline">LinkedIn</a> <!-- Assuming URL exists or fallback -->
+                <a href={personalInfo.url} target="_blank" class="hover:underline">LinkedIn</a>
                 <span>|</span>
-                <a href="https://github.com/joelfatnugget" class="hover:underline">GitHub</a>
+                <a href="https://github.com/joelfatnugget" target="_blank" class="hover:underline">GitHub</a>
             </div>
         </header>
 
@@ -41,15 +38,12 @@
                 {#each education as edu}
                     <div class="flex flex-col">
                         <div class="flex justify-between items-baseline font-bold">
-                            <span>{edu.institution} ({edu.degree})</span>
-                            <span class="text-right whitespace-nowrap">{edu.location} | {formatDate(edu.startDate)} - {formatDate(edu.endDate)}</span>
+                            <span>{edu.institution}</span>
+                            <span class="text-right whitespace-nowrap">{edu.location} | {formatDate(edu.startDate)} – {formatDate(edu.endDate)}</span>
                         </div>
-                        {#if edu.description}
-                            <div class="text-black">
-                                {#each edu.description as desc}
-                                    <span>{desc}</span>{/each}
-                            </div>
-                        {/if}
+                        <div class="font-medium text-black">
+                            {edu.degree}
+                        </div>
                     </div>
                 {/each}
             </div>
@@ -92,12 +86,10 @@
         <section class="mb-5">
             <h2 class="text-lg font-bold uppercase border-b border-black mb-2">Skills & Interests</h2>
             <ul class="list-disc list-outside ml-5 space-y-1">
-                <li>
-                    <span class="font-bold">Proficient in:</span> {skillList}
-                </li>
-                <li>
-                    <span>Graduated from Heicoders AI100 & AI200 (Python Programming and Data Visualisation | Applied Machine Learning) and Smartcademy Data Analytics Course</span>
-                </li>
+                <li><span class="font-bold">Languages:</span> Python, PHP, JavaScript, CSS, Java</li>
+                <li><span class="font-bold">Tools:</span> Docker, AWS, Azure, MySQL, Git, Jenkins</li>
+                <li><span class="font-bold">Certifications:</span> Heicoders AI100/200, Smartcademy Data Analytics, Google Cloud Fundamentals</li>
+                <li><span class="font-bold">Frameworks & Architecture:</span> RAG, REST APIs, Microservices, SwiftUI, Node.js/Express, React</li>
             </ul>
         </section>
 
@@ -163,8 +155,6 @@
             color: black !important;
         }
         
-        /* Force background graphics if user browser supports it/is set, 
-           but mainly ensure our background is white */
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;

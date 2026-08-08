@@ -1,28 +1,21 @@
 <script lang="ts">
     import { experiences, skills } from '$lib/data';
-    import { Briefcase, Calendar, MapPin } from 'lucide-svelte';
+    import { Briefcase, Calendar, MapPin, Sparkles } from 'lucide-svelte';
     import { onMount } from 'svelte';
     import { tilt } from '$lib/actions/tilt';
-    import { formatDate } from '$lib/utils';
+    import { formatDate, highlightImpact } from '$lib/utils';
     import Icon from '@iconify/svelte';
 
-    // State for skill highlighting
+    // State for cross-card skill highlighting
     let hoveredSkill = $state<string | null>(null);
+    let activeHash = $state<string>('');
 
     // Helper: Find icon for skill
     function getSkillIcon(name: string): string | undefined {
-        return skills.find(s => s.name === name)?.icon;
+        return skills.find(s => s.name.toLowerCase() === name.toLowerCase())?.icon;
     }
 
-    // Helper: Highlight impact metrics
-    function highlightImpact(text: string): string {
-        // Matches: 98%, 1st, 2nd, numbers followed by 'man-hours', etc.
-        return text.replace(/(\d+%|\d+(?:st|nd|rd|th)|~?\d+\+?)/g, 
-            '<span class="font-bold text-primary-600 dark:text-primary-400">$1</span>'
-        );
-    }
-
-    // Simple Action for intersection observer animation
+    // Intersection observer reveal
     function reveal(node: HTMLElement) {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -31,7 +24,7 @@
                     observer.unobserve(node);
                 }
             });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.05 });
 
         observer.observe(node);
 
@@ -41,121 +34,174 @@
             }
         };
     }
+
+    onMount(() => {
+        if (typeof window !== 'undefined') {
+            activeHash = window.location.hash.replace('#', '');
+            if (activeHash) {
+                const target = document.getElementById(activeHash);
+                if (target) {
+                    setTimeout(() => {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            }
+        }
+    });
 </script>
 
-<div class="relative min-h-screen overflow-hidden">
-    <!-- Rich Background Pattern -->
-    <div class="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-black bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
-        <div class="absolute right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary-500 opacity-20 blur-[100px]"></div>
-        <div class="absolute left-0 bottom-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-tertiary-500 opacity-20 blur-[100px]"></div>
+<div class="relative min-h-screen pt-12 pb-24 overflow-x-hidden">
+    <!-- Ambient Background Mesh -->
+    <div class="absolute inset-0 -z-10 h-full w-full bg-white dark:bg-black bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:16px_28px]">
+        <div class="absolute right-10 top-20 -z-10 h-[350px] w-[350px] rounded-full bg-primary-500/15 blur-[120px]"></div>
+        <div class="absolute left-10 bottom-20 -z-10 h-[350px] w-[350px] rounded-full bg-tertiary-500/15 blur-[120px]"></div>
     </div>
 
-    <div class="container mx-auto px-4 py-12 max-w-4xl relative z-10">
-        <header class="mb-16 text-center">
-        <h1 class="h1 font-bold mb-4">Professional Experience</h1>
-        <p class="text-surface-600 dark:text-surface-300">My journey through the tech industry.</p>
-    </header>
+    <div class="container mx-auto px-4 max-w-5xl relative z-10">
+        
+        <!-- Header -->
+        <header class="mb-16 text-center space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 text-primary-600 dark:text-primary-400 text-xs font-semibold uppercase tracking-widest border border-primary-500/20">
+                <Sparkles class="size-3.5" /> Career Journey
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-surface-900 dark:text-white">
+                Professional Experience
+            </h1>
+            <p class="text-lg text-surface-600 dark:text-surface-300 max-w-2xl mx-auto">
+                Architecting high-scale enterprise software, GenAI automation pipelines, and native mobile apps.
+            </p>
 
-    <div class="relative space-y-12">
-        <!-- Vertical Line -->
-        <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-surface-200-700-token transform -translate-x-1/2"></div>
-
-        {#each experiences as job, i}
-            <div 
-                use:reveal 
-                id={job.id}
-                class="reveal-item relative flex flex-col md:flex-row gap-8 items-start group"
-                class:md:flex-row-reverse={i % 2 !== 0}
-            >
-                <!-- Timeline Dot -->
-                <div 
-                    class="absolute left-4 md:left-1/2 w-4 h-4 rounded-full border-4 border-surface-50 dark:border-surface-900 transform -translate-x-1/2 mt-6 z-10 transition-transform duration-300 group-hover:scale-150"
-                    style="background-color: {job.color || 'var(--color-primary-500)'}"
-                ></div>
-
-                <!-- Date (Desktop: Opposite side) -->
-                <div class="hidden md:block w-1/2 text-right pt-5 px-8" class:text-left={i % 2 !== 0} class:text-right={i % 2 === 0}>
-                    <span 
-                        class="font-mono text-sm font-bold tracking-widest"
-                        style="color: {job.color || 'var(--color-primary-500)'}"
-                    >
-                        {formatDate(job.startDate)} — {formatDate(job.endDate)}
+            <!-- Skill Filter Legend -->
+            {#if hoveredSkill}
+                <div class="pt-2 animate-in fade-in duration-200">
+                    <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-500 text-white font-medium text-xs shadow-md">
+                        Highlighting experience using "{hoveredSkill}"
                     </span>
                 </div>
+            {/if}
+        </header>
 
-                <!-- Content Card -->
-                <div class="w-full md:w-1/2 pl-12 md:pl-0">
-                    <!-- Mobile Date -->
+        <!-- Timeline Container -->
+        <div class="relative space-y-16">
+            <!-- Vertical Line -->
+            <div class="absolute left-6 md:left-1/2 top-4 bottom-4 w-0.5 bg-surface-200 dark:bg-surface-800 -translate-x-1/2"></div>
+
+            {#each experiences as job, i (job.id)}
+                {@const isHighlighted = activeHash === job.id}
+                {@const matchesHoveredSkill = hoveredSkill !== null && job.skills.some(s => s.toLowerCase() === hoveredSkill?.toLowerCase())}
+                
+                <div 
+                    use:reveal 
+                    id={job.id}
+                    class="reveal-item relative flex flex-col md:flex-row gap-8 items-start group"
+                    class:md:flex-row-reverse={i % 2 !== 0}
+                >
+                    <!-- Timeline Node Indicator -->
                     <div 
-                        class="md:hidden font-mono text-sm font-bold tracking-widest mb-2"
-                        style="color: {job.color || 'var(--color-primary-500)'}"
-                    >
-                        {formatDate(job.startDate)} — {formatDate(job.endDate)}
+                        class="absolute left-6 md:left-1/2 w-5 h-5 rounded-full border-4 border-white dark:border-surface-950 -translate-x-1/2 mt-6 z-20 transition-all duration-300 shadow-md group-hover:scale-150 {matchesHoveredSkill ? 'scale-150 ring-4 ring-primary-500/50' : ''}"
+                        style="background-color: {job.color || 'var(--color-primary-500)'}"
+                    ></div>
+
+                    <!-- Date Column (Desktop) -->
+                    <div class="hidden md:block w-1/2 text-right pt-5 px-8" class:text-left={i % 2 !== 0} class:text-right={i % 2 === 0}>
+                        <span 
+                            class="font-mono text-sm font-bold tracking-widest px-3 py-1 rounded-full bg-surface-100 dark:bg-surface-800/80 border border-surface-200 dark:border-surface-700 shadow-xs inline-block"
+                            style="color: {job.color || 'var(--color-primary-500)'}"
+                        >
+                            {formatDate(job.startDate)} — {formatDate(job.endDate)}
+                        </span>
                     </div>
-                    
-                    <div 
-                        use:tilt={{ max: 5, scale: 1.02 }}
-                        class="card p-6 shadow-xl transition-all duration-300 border-l-4 bg-surface-50 dark:bg-surface-800 relative overflow-hidden"
-                        style="border-left-color: {job.color || 'var(--color-primary-500)'}; --brand-color: {job.color || 'var(--color-primary-500)'}"
-                    >
-                        <!-- Glow Effect on Hover -->
-                        <div class="absolute inset-0 bg-gradient-to-r from-[var(--brand-color)] to-transparent opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none"></div>
 
-                        <!-- Watermark Logo -->
-                        {#if job.logo}
-                            <img 
-                                src={job.logo} 
-                                alt="" 
-                                class="absolute -right-6 -bottom-6 w-32 h-32 opacity-[0.03] grayscale rotate-12 pointer-events-none z-0"
-                            />
-                        {/if}
-
-                        <header class="mb-4 relative z-10 flex justify-between items-start">
-                            <div>
-                                <h3 class="h3 font-bold">{job.role}</h3>
-                                <div class="flex items-center gap-2 text-surface-600 dark:text-surface-300 text-sm mt-1">
-                                    <Briefcase class="size-4" />
-                                    <span>{job.company}</span>
-                                    <span class="mx-1">•</span>
-                                    <MapPin class="size-4" />
-                                    <span>{job.location}</span>
-                                </div>
-                            </div>
-                            
+                    <!-- Experience Card Column -->
+                    <div class="w-full md:w-1/2 pl-14 md:pl-0">
+                        <!-- Mobile Date -->
+                        <div class="md:hidden font-mono text-xs font-bold tracking-wider mb-3">
+                            <span 
+                                class="px-2.5 py-1 rounded-full bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700"
+                                style="color: {job.color || 'var(--color-primary-500)'}"
+                            >
+                                {formatDate(job.startDate)} — {formatDate(job.endDate)}
+                            </span>
+                        </div>
+                        
+                        <div 
+                            use:tilt={{ max: 3, scale: 1.01 }}
+                            class="relative p-6 sm:p-8 rounded-2xl bg-white dark:bg-surface-900/90 backdrop-blur-md border border-surface-200/80 dark:border-surface-800 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden group/card
+                            {isHighlighted ? 'ring-2 ring-primary-500 shadow-primary-500/20' : ''}
+                            {matchesHoveredSkill ? 'border-primary-500 dark:border-primary-400 ring-1 ring-primary-500/30' : ''}"
+                            style="border-left: 5px solid {job.color || '#3b82f6'};"
+                        >
+                            <!-- Watermark Logo -->
                             {#if job.logo}
-                                <div class="bg-white p-1.5 rounded-lg shadow-sm border border-surface-200 dark:border-surface-700">
-                                    <img src={job.logo} alt="{job.company} Logo" class="w-10 h-10 object-contain" />
-                                </div>
+                                <img 
+                                    src={job.logo} 
+                                    alt="" 
+                                    class="absolute -right-8 -bottom-8 w-40 h-40 opacity-[0.04] dark:opacity-[0.06] grayscale rotate-12 pointer-events-none z-0"
+                                />
                             {/if}
-                        </header>
 
-                        <ul class="list-disc list-outside ml-4 space-y-2 text-surface-700 dark:text-surface-200 mb-6 relative z-10">
-                            {#each job.description as item}
-                                <li>{@html highlightImpact(item)}</li>
-                            {/each}
-                        </ul>
+                            <header class="mb-5 relative z-10 flex justify-between items-start gap-4">
+                                <div>
+                                    <h3 class="text-xl sm:text-2xl font-bold text-surface-900 dark:text-white tracking-tight group-hover/card:text-primary-600 dark:group-hover/card:text-primary-400 transition-colors">
+                                        {job.role}
+                                    </h3>
+                                    <div class="flex flex-wrap items-center gap-2 text-surface-600 dark:text-surface-300 text-sm mt-1">
+                                        <div class="flex items-center gap-1.5 font-semibold text-surface-800 dark:text-surface-200">
+                                            <Briefcase class="size-4 text-primary-500" />
+                                            <span>{job.company}</span>
+                                        </div>
+                                        <span>•</span>
+                                        <div class="flex items-center gap-1">
+                                            <MapPin class="size-3.5 text-surface-400" />
+                                            <span>{job.location}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {#if job.logo}
+                                    <div class="bg-white p-2 rounded-xl shadow-sm border border-surface-200/80 dark:border-surface-700 flex-shrink-0">
+                                        <img src={job.logo} alt="{job.company} Logo" class="w-10 h-10 object-contain" />
+                                    </div>
+                                {/if}
+                            </header>
 
-                        <footer class="flex flex-wrap gap-2 relative z-10">
-                            {#each job.skills as skill}
-                                {@const icon = getSkillIcon(skill)}
-                                <span 
-                                    class="badge flex items-center gap-1.5 py-1 pr-3 pl-2 transition-all duration-200 cursor-default border border-surface-200 dark:border-surface-700
-                                    {hoveredSkill === skill ? 'bg-[var(--brand-color)] text-white scale-110 shadow-md border-transparent' : 'variant-soft-secondary'}"
-                                    onmouseenter={() => hoveredSkill = skill}
-                                    onmouseleave={() => hoveredSkill = null}
-                                >
-                                    {#if icon}
-                                        <Icon icon={icon} class="text-lg" />
-                                    {/if}
-                                    {skill}
-                                </span>
-                            {/each}
-                        </footer>
+                            <!-- Bullet Points -->
+                            <ul class="space-y-3 text-surface-700 dark:text-surface-300 text-sm sm:text-base leading-relaxed mb-6 relative z-10">
+                                {#each job.description as item}
+                                    <li class="flex items-start gap-2.5">
+                                        <span class="size-1.5 rounded-full bg-primary-500 mt-2 flex-shrink-0"></span>
+                                        <span>{@html highlightImpact(item)}</span>
+                                    </li>
+                                {/each}
+                            </ul>
+
+                            <!-- Skill Badges with Cross-Highlighting -->
+                            <footer class="flex flex-wrap gap-2 relative z-10 pt-4 border-t border-surface-100 dark:border-surface-800">
+                                {#each job.skills as skill}
+                                    {@const icon = getSkillIcon(skill)}
+                                    {@const isCurrentHover = hoveredSkill?.toLowerCase() === skill.toLowerCase()}
+                                    <button 
+                                        type="button"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-200 border cursor-pointer
+                                        {isCurrentHover 
+                                            ? 'bg-primary-600 text-white border-primary-600 shadow-md scale-110 z-20' 
+                                            : 'bg-surface-100 dark:bg-surface-800 border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-300 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400'}"
+                                        onmouseenter={() => hoveredSkill = skill}
+                                        onmouseleave={() => hoveredSkill = null}
+                                        onclick={() => hoveredSkill = hoveredSkill === skill ? null : skill}
+                                    >
+                                        {#if icon}
+                                            <Icon icon={icon} class="text-sm" />
+                                        {/if}
+                                        {skill}
+                                    </button>
+                                {/each}
+                            </footer>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {/each}
-    </div>
+            {/each}
+        </div>
     </div>
 </div>
 

@@ -33,7 +33,7 @@
 
             <div class="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
                 <a 
-                    href="https://www.giveblood.sg/" 
+                    href="https://giveblood.sg/" 
                     target="_blank"
                     class="btn bg-white text-red-700 hover:bg-red-50 font-bold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
                 >

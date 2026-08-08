@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Tailwind CSS v4 Class-based Dark Mode Directive */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Skeleton Imports */
 @import "../node_modules/@skeletonlabs/skeleton/src/base/globals.css";
 @import "../node_modules/@skeletonlabs/skeleton/src/base/theme.css";
