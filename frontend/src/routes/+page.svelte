@@ -59,14 +59,6 @@
     <!-- MAIN HERO SECTION -->
     <section class="container mx-auto px-4 py-16 md:py-24 flex flex-col items-center justify-center text-center space-y-8 relative z-10 max-w-5xl">
         
-        <!-- Status Pill -->
-        <div 
-            use:scrollReveal={{ delay: 0 }}
-            class="motion-item fade-down inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold border border-emerald-500/20 shadow-sm"
-        >
-            <span class="size-2 rounded-full bg-emerald-500 animate-ping"></span>
-            Available for Software Engineering Roles
-        </div>
 
         <!-- High-Impact Hero Headline -->
         <h1 
