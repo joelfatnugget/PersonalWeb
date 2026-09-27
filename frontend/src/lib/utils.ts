@@ -217,3 +217,35 @@ export function findProjectByHash(hash: string, projectsList: Project[]): Projec
     return projectsList.find(p => p.id === id || `proj-${p.id}` === id || p.id === `proj-${id}`);
 }
 
+export type BloodStockStatus = 'healthy' | 'moderate' | 'critical';
+
+export interface BloodStockStatusInfo {
+    label: string;
+    status: BloodStockStatus;
+    badgeClass: string;
+}
+
+export function getBloodStockStatus(level: string): BloodStockStatusInfo {
+    const normalized = (level || '').trim().toLowerCase();
+    if (normalized === 'healthy' || normalized === 'high') {
+        return {
+            label: level.trim() || 'Healthy',
+            status: 'healthy',
+            badgeClass: 'bg-green-500/20 text-green-300 border-green-500/30'
+        };
+    }
+    if (normalized === 'moderate') {
+        return {
+            label: level.trim(),
+            status: 'moderate',
+            badgeClass: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+        };
+    }
+    return {
+        label: level.trim() || 'Critical',
+        status: 'critical',
+        badgeClass: 'bg-red-500/20 text-red-300 border-red-500/30'
+    };
+}
+
+

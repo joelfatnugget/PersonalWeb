@@ -229,4 +229,41 @@ describe('Portfolio Utility Functions', () => {
             expect(calculateStaggerDelay(3, 100, 80)).toBe(340);
         });
     });
+
+    describe('getBloodStockStatus', () => {
+        it('classifies Healthy and High as healthy status with green badge', async () => {
+            const { getBloodStockStatus } = await import('./utils');
+            const healthy = getBloodStockStatus('Healthy');
+            expect(healthy.status).toBe('healthy');
+            expect(healthy.label).toBe('Healthy');
+            expect(healthy.badgeClass).toContain('green');
+
+            const high = getBloodStockStatus('High');
+            expect(high.status).toBe('healthy');
+            expect(high.label).toBe('High');
+            expect(high.badgeClass).toContain('green');
+        });
+
+        it('classifies Moderate with yellow badge', async () => {
+            const { getBloodStockStatus } = await import('./utils');
+            const moderate = getBloodStockStatus('Moderate');
+            expect(moderate.status).toBe('moderate');
+            expect(moderate.label).toBe('Moderate');
+            expect(moderate.badgeClass).toContain('yellow');
+        });
+
+        it('classifies Low, Critical, and unknown with red badge', async () => {
+            const { getBloodStockStatus } = await import('./utils');
+            const low = getBloodStockStatus('Low');
+            expect(low.status).toBe('critical');
+            expect(low.label).toBe('Low');
+            expect(low.badgeClass).toContain('red');
+
+            const critical = getBloodStockStatus('Critical');
+            expect(critical.status).toBe('critical');
+            expect(critical.label).toBe('Critical');
+            expect(critical.badgeClass).toContain('red');
+        });
+    });
 });
+
