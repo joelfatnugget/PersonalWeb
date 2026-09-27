@@ -188,3 +188,32 @@ export function parseBlogRss(rssXml: string): (BlogPostPreview & { pubDate?: str
         return dateB - dateA;
     });
 }
+
+export function updatePaletteIndex(currentIndex: number, key: string, totalItems: number): number {
+    if (totalItems <= 1) return 0;
+    if (key === 'ArrowDown') {
+        return (currentIndex + 1) % totalItems;
+    }
+    if (key === 'ArrowUp') {
+        return (currentIndex - 1 + totalItems) % totalItems;
+    }
+    return currentIndex;
+}
+
+export function formatProjectHash(id: string): string {
+    if (!id) return '';
+    return id.startsWith('#') ? id : `#${id}`;
+}
+
+export function parseProjectHash(hash: string): string | null {
+    if (!hash) return null;
+    const clean = hash.replace(/^#/, '').trim();
+    return clean.length > 0 ? clean : null;
+}
+
+export function findProjectByHash(hash: string, projectsList: Project[]): Project | undefined {
+    const id = parseProjectHash(hash);
+    if (!id) return undefined;
+    return projectsList.find(p => p.id === id || `proj-${p.id}` === id || p.id === `proj-${id}`);
+}
+

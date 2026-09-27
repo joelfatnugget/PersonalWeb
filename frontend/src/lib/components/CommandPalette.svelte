@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import { goto } from '$app/navigation';
-    import { experiences, projects, personalInfo, socials } from '$lib/data';
-    import { searchPortfolio, type SearchResult } from '$lib/utils';
+    import { experiences, projects, personalInfo } from '$lib/data';
+    import { searchPortfolio, updatePaletteIndex, type SearchResult } from '$lib/utils';
     import { 
         Search, 
-        Command, 
         Moon, 
         Sun, 
         FileText, 
@@ -16,9 +15,9 @@
         ArrowRight, 
         X,
         Sparkles,
-        ExternalLink
+        ExternalLink,
+        CornerDownLeft
     } from 'lucide-svelte';
-    import Icon from '@iconify/svelte';
 
     let { open = $bindable(false) } = $props();
 
@@ -26,8 +25,37 @@
     let selectedIndex = $state(0);
     let copied = $state(false);
     let isDarkMode = $state(false);
+    let inputElement = $state<HTMLInputElement | null>(null);
 
     let searchResults = $derived(searchPortfolio(query, experiences, projects));
+
+    const quickNavItems = [
+        { label: 'Go to Home', url: '/', hint: '/' },
+        { label: 'Go to Experience', url: '/experience', hint: '/experience' },
+        { label: 'Visit Technical Blog', url: 'https://blog.joelfatnugget.xyz/', hint: 'blog.joelfatnugget.xyz', external: true },
+        { label: 'Go to Projects', url: '/projects', hint: '/projects' },
+        { label: 'Go to Resume', url: '/resume', hint: '/resume' },
+        { label: 'Go to Applications', url: '/applications', hint: '/applications' }
+    ];
+
+    let totalSelectable = $derived(
+        query.trim() !== '' ? searchResults.length : quickNavItems.length
+    );
+
+    $effect(() => {
+        // Reset selection index when query changes
+        if (query !== undefined) {
+            selectedIndex = 0;
+        }
+    });
+
+    $effect(() => {
+        if (open) {
+            tick().then(() => {
+                inputElement?.focus();
+            });
+        }
+    });
 
     function checkDarkMode() {
         if (typeof document !== 'undefined') {
@@ -51,17 +79,10 @@
     }
 
     function copyToClipboard(text: string) {
-        navigator.clipboard.writeText(text);
-        copied = true;
-        setTimeout(() => (copied = false), 2000);
-    }
-
-    function handleKeydown(e: KeyboardEvent) {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            open = !open;
-        } else if (e.key === 'Escape' && open) {
-            open = false;
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+            copied = true;
+            setTimeout(() => (copied = false), 2000);
         }
     }
 
@@ -75,6 +96,39 @@
         }
     }
 
+    function executeSelection() {
+        if (query.trim() !== '') {
+            if (searchResults.length > 0 && selectedIndex < searchResults.length) {
+                navigate(searchResults[selectedIndex].url);
+            }
+        } else {
+            if (quickNavItems.length > 0 && selectedIndex < quickNavItems.length) {
+                navigate(quickNavItems[selectedIndex].url);
+            }
+        }
+    }
+
+    function handleKeydown(e: KeyboardEvent) {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            open = !open;
+            return;
+        }
+
+        if (!open) return;
+
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            open = false;
+        } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = updatePaletteIndex(selectedIndex, e.key, totalSelectable);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            executeSelection();
+        }
+    }
+
     onMount(() => {
         checkDarkMode();
         window.addEventListener('keydown', handleKeydown);
@@ -83,33 +137,44 @@
 </script>
 
 {#if open}
-    <!-- Backdrop -->
+    <!-- Accessible Modal Container -->
     <div 
-        class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center pt-16 md:pt-24 px-4 transition-opacity animate-in fade-in duration-200"
-        onclick={() => open = false}
-        role="button"
-        tabindex="-1"
+        class="fixed inset-0 z-50 flex items-start justify-center pt-16 md:pt-24 px-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="command-palette-title"
     >
-        <!-- Modal Content -->
+        <!-- Backdrop Button -->
+        <button 
+            type="button"
+            class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200 cursor-default border-none w-full h-full"
+            onclick={() => open = false}
+            aria-label="Close search overlay"
+        ></button>
+
+        <!-- Modal Dialog Window -->
         <div 
-            class="w-full max-w-2xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] transition-all transform animate-in zoom-in-95 duration-200"
-            onclick={(e) => e.stopPropagation()}
-            role="document"
+            class="relative z-10 w-full max-w-2xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] transition-all transform animate-in zoom-in-95 duration-200"
         >
+            <h2 id="command-palette-title" class="sr-only">Quick Command Palette and Search</h2>
+
             <!-- Search Header -->
             <div class="flex items-center px-4 py-3 border-b border-surface-200 dark:border-surface-800 gap-3">
                 <Search class="size-5 text-surface-400" />
                 <input 
+                    bind:this={inputElement}
                     type="text" 
-                    placeholder="Type a command or search (e.g. Visa, Svelte, Resume, Dark)..." 
+                    placeholder="Type a command or search (e.g. Visa, Svelte, Resume, Blog)..." 
                     bind:value={query}
                     class="w-full bg-transparent text-surface-900 dark:text-white placeholder-surface-400 focus:outline-none text-base"
-                    autofocus
+                    aria-label="Search portfolio"
                 />
                 {#if query}
                     <button 
+                        type="button"
                         onclick={() => query = ''}
-                        class="p-1 rounded-md text-surface-400 hover:text-surface-700 dark:hover:text-surface-200"
+                        class="p-1 rounded-md text-surface-400 hover:text-surface-700 dark:hover:text-surface-200 cursor-pointer"
+                        aria-label="Clear search input"
                     >
                         <X class="size-4" />
                     </button>
@@ -125,14 +190,19 @@
                 <!-- Dynamic Search Results -->
                 {#if query.trim() !== ''}
                     {#if searchResults.length > 0}
-                        <div class="space-y-1">
+                        <div class="space-y-1" role="listbox" aria-label="Search results">
                             <div class="px-3 text-xs font-semibold uppercase tracking-wider text-surface-400 py-1">
                                 Search Results ({searchResults.length})
                             </div>
-                            {#each searchResults as item}
+                            {#each searchResults as item, index}
+                                {@const isSelected = index === selectedIndex}
                                 <button 
-                                    class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors group"
+                                    type="button"
+                                    role="option"
+                                    aria-selected={isSelected}
+                                    class="w-full flex items-center justify-between p-3 rounded-xl text-left transition-colors cursor-pointer group {isSelected ? 'bg-primary-500/10 border border-primary-500/30 dark:bg-primary-950/30' : 'hover:bg-surface-100 dark:hover:bg-surface-800'}"
                                     onclick={() => navigate(item.url)}
+                                    onmouseenter={() => selectedIndex = index}
                                 >
                                     <div class="flex items-center gap-3 overflow-hidden">
                                         {#if item.type === 'page'}
@@ -151,7 +221,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <ArrowRight class="size-4 text-surface-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                                    <div class="flex items-center gap-2">
+                                        {#if isSelected}
+                                            <CornerDownLeft class="size-3.5 text-primary-500 animate-in fade-in" />
+                                        {/if}
+                                        <ArrowRight class="size-4 text-surface-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                                    </div>
                                 </button>
                             {/each}
                         </div>
@@ -162,48 +237,34 @@
                     {/if}
                 {:else}
                     <!-- Quick Navigation -->
-                    <div class="space-y-1">
+                    <div class="space-y-1" role="listbox" aria-label="Navigation shortcuts">
                         <div class="px-3 text-xs font-semibold uppercase tracking-wider text-surface-400 py-1">
                             Navigation
                         </div>
-                        <button 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
-                            onclick={() => navigate('/')}
-                        >
-                            <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Go to Home</span>
-                            <span class="text-xs text-surface-400 font-mono">/</span>
-                        </button>
-                        <button 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
-                            onclick={() => navigate('/experience')}
-                        >
-                            <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Go to Experience</span>
-                            <span class="text-xs text-surface-400 font-mono">/experience</span>
-                        </button>
-                        <button 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
-                            onclick={() => navigate('https://blog.joelfatnugget.xyz/')}
-                        >
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Visit Technical Blog</span>
-                                <ExternalLink class="size-3 text-primary-500" />
-                            </div>
-                            <span class="text-xs text-surface-400 font-mono">blog.joelfatnugget.xyz</span>
-                        </button>
-                        <button 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
-                            onclick={() => navigate('/projects')}
-                        >
-                            <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Go to Projects</span>
-                            <span class="text-xs text-surface-400 font-mono">/projects</span>
-                        </button>
-                        <button 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
-                            onclick={() => navigate('/resume')}
-                        >
-                            <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Go to Resume</span>
-                            <span class="text-xs text-surface-400 font-mono">/resume</span>
-                        </button>
+                        {#each quickNavItems as item, index}
+                            {@const isSelected = index === selectedIndex}
+                            <button 
+                                type="button"
+                                role="option"
+                                aria-selected={isSelected}
+                                class="w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-colors cursor-pointer {isSelected ? 'bg-primary-500/10 border border-primary-500/30 dark:bg-primary-950/30' : 'hover:bg-surface-100 dark:hover:bg-surface-800'}"
+                                onclick={() => navigate(item.url)}
+                                onmouseenter={() => selectedIndex = index}
+                            >
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-medium text-surface-800 dark:text-surface-200">{item.label}</span>
+                                    {#if item.external}
+                                        <ExternalLink class="size-3 text-primary-500" />
+                                    {/if}
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    {#if isSelected}
+                                        <CornerDownLeft class="size-3 text-primary-500" />
+                                    {/if}
+                                    <span class="text-xs text-surface-400 font-mono">{item.hint}</span>
+                                </div>
+                            </button>
+                        {/each}
                     </div>
 
                     <!-- Actions -->
@@ -212,7 +273,8 @@
                             Actions & Preferences
                         </div>
                         <button 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
+                            type="button"
+                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors cursor-pointer"
                             onclick={toggleDarkMode}
                         >
                             <div class="flex items-center gap-2">
@@ -228,13 +290,14 @@
                         </button>
 
                         <button 
-                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors"
+                            type="button"
+                            class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-800 text-left transition-colors cursor-pointer"
                             onclick={() => copyToClipboard(personalInfo.email)}
                         >
                             <div class="flex items-center gap-2">
                                 {#if copied}
                                     <Check class="size-4 text-emerald-500" />
-                                    <span class="text-sm font-medium text-emerald-600 dark:text-emerald-400">Email Copied!</span>
+                                    <span class="text-sm font-medium text-emerald-600 dark:text-emerald-400">Email Copied</span>
                                 {:else}
                                     <Copy class="size-4 text-surface-400" />
                                     <span class="text-sm font-medium text-surface-800 dark:text-surface-200">Copy Contact Email</span>
@@ -250,10 +313,11 @@
             <div class="px-4 py-2.5 bg-surface-50 dark:bg-surface-950 border-t border-surface-200 dark:border-surface-800 flex items-center justify-between text-xs text-surface-500">
                 <div class="flex items-center gap-2">
                     <Sparkles class="size-3 text-primary-500" />
-                    <span>antigravity engine v2.5</span>
+                    <span>Quick Navigation & Search</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span>Press <kbd class="font-mono bg-surface-200 dark:bg-surface-800 px-1.5 py-0.5 rounded">ESC</kbd> to exit</span>
+                    <span>Use <kbd class="font-mono bg-surface-200 dark:bg-surface-800 px-1 py-0.5 rounded text-[11px]">↑</kbd> <kbd class="font-mono bg-surface-200 dark:bg-surface-800 px-1 py-0.5 rounded text-[11px]">↓</kbd> to navigate</span>
+                    <span>Press <kbd class="font-mono bg-surface-200 dark:bg-surface-800 px-1.5 py-0.5 rounded text-[11px]">ESC</kbd> to exit</span>
                 </div>
             </div>
         </div>

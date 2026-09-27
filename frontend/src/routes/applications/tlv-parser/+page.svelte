@@ -26,41 +26,39 @@
     import { fly, fade } from 'svelte/transition';
 
     const codePages = getSupportedCodePages();
-    let selectedCodePage: SupportedCodePage = 'IBM1047';
+    let selectedCodePage = $state<SupportedCodePage>('IBM1047');
 
     // Active Modes: 'parser' | 'visualizer' | 'matrix' | 'converter' | 'builder'
-    let activeTab: 'parser' | 'visualizer' | 'matrix' | 'converter' | 'builder' = 'parser';
+    let activeTab = $state<'parser' | 'visualizer' | 'matrix' | 'converter' | 'builder'>('parser');
 
     // Parser State
-    let inputHex = '6F1E8407A0000000031010A513500BC8C5D3D3D640E6D6D9D3C49F0206000000001000';
+    let inputHex = $state('6F1E8407A0000000031010A513500BC8C5D3D3D640E6D6D9D3C49F0206000000001000');
 
-    let parsedNodes: TLVNode[] = [];
-    let parseError = '';
+    let parsedNodes = $state<TLVNode[]>([]);
+    let parseError = $state('');
 
     // Converter State (Hex <-> Literal)
-    let convHex = 'C8C5D3D3D640E6D6D9D3C440F1F2F3'; // "HELLO WORLD 123" in IBM037 EBCDIC
-    let convLiteral = '';
-    let convDirection: 'hexToLiteral' | 'literalToHex' = 'hexToLiteral';
+    let convHex = $state('C8C5D3D3D640E6D6D9D3C440F1F2F3'); // "HELLO WORLD 123" in IBM037 EBCDIC
+    let convLiteral = $state('');
+    let convDirection = $state<'hexToLiteral' | 'literalToHex'>('hexToLiteral');
 
     // Builder State
-    let buildTag = '50';
-    let buildLiteral = 'VISA CREDIT';
-    let builtHex = '';
+    let buildTag = $state('50');
+    let buildLiteral = $state('VISA CREDIT');
+    let builtHex = $state('');
 
-    let copiedStatus: Record<string, boolean> = {};
+    let copiedStatus = $state<Record<string, boolean>>({});
 
     function copyToClipboard(key: string, text: string) {
         navigator.clipboard.writeText(text);
         copiedStatus[key] = true;
         setTimeout(() => {
             copiedStatus[key] = false;
-            copiedStatus = { ...copiedStatus };
         }, 2000);
-        copiedStatus = { ...copiedStatus };
     }
 
     // Reactive parse execution
-    $: {
+    $effect(() => {
         try {
             if (inputHex.trim()) {
                 parsedNodes = parseTLV(inputHex, { encoding: selectedCodePage });
@@ -73,23 +71,23 @@
             parseError = err?.message || 'Error parsing TLV structure';
             parsedNodes = [];
         }
-    }
+    });
 
     // Reactive converter updates
-    $: {
+    $effect(() => {
         if (convDirection === 'hexToLiteral') {
             convLiteral = ebcdicToLiteral(convHex, selectedCodePage);
         } else {
             convHex = literalToEbcdic(convLiteral, selectedCodePage);
         }
-    }
+    });
 
     // Reactive builder updates
-    $: {
+    $effect(() => {
         if (buildTag && buildLiteral !== undefined) {
             builtHex = encodeTLV(buildTag, buildLiteral, selectedCodePage);
         }
-    }
+    });
 
     function handleConvHexChange(e: Event) {
         convDirection = 'hexToLiteral';
@@ -217,36 +215,41 @@
             </span>
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-1 bg-surface-200 dark:bg-surface-900 p-1 rounded-xl">
                 <button 
-                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all {activeTab === 'parser' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
-                    on:click={() => activeTab = 'parser'}
+                    type="button"
+                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer {activeTab === 'parser' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
+                    onclick={() => activeTab = 'parser'}
                 >
                     <Layers class="size-3.5" />
                     <span>Parser</span>
                 </button>
                 <button 
-                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all {activeTab === 'visualizer' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
-                    on:click={() => activeTab = 'visualizer'}
+                    type="button"
+                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer {activeTab === 'visualizer' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
+                    onclick={() => activeTab = 'visualizer'}
                 >
                     <Activity class="size-3.5" />
                     <span>Pipeline</span>
                 </button>
                 <button 
-                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all {activeTab === 'matrix' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
-                    on:click={() => activeTab = 'matrix'}
+                    type="button"
+                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer {activeTab === 'matrix' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
+                    onclick={() => activeTab = 'matrix'}
                 >
                     <Grid class="size-3.5" />
                     <span>Matrix</span>
                 </button>
                 <button 
-                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all {activeTab === 'converter' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
-                    on:click={() => activeTab = 'converter'}
+                    type="button"
+                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer {activeTab === 'converter' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
+                    onclick={() => activeTab = 'converter'}
                 >
                     <ArrowRightLeft class="size-3.5" />
                     <span>Translator</span>
                 </button>
                 <button 
-                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all {activeTab === 'builder' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
-                    on:click={() => activeTab = 'builder'}
+                    type="button"
+                    class="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer {activeTab === 'builder' ? 'bg-primary-500 text-white shadow' : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-100'}"
+                    onclick={() => activeTab = 'builder'}
                 >
                     <Code2 class="size-3.5" />
                     <span>Builder</span>
@@ -266,8 +269,9 @@
                 <div class="flex flex-wrap gap-2">
                     {#each presets as preset}
                         <button 
-                            class="px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-200/80 dark:bg-surface-700/60 hover:bg-primary-500/20 hover:text-primary-600 dark:hover:text-primary-300 border border-surface-300 dark:border-surface-600 transition-colors"
-                            on:click={() => applyPreset(preset.hex)}
+                            type="button"
+                            class="px-3 py-1.5 rounded-xl text-xs font-medium bg-surface-200/80 dark:bg-surface-700/60 hover:bg-primary-500/20 hover:text-primary-600 dark:hover:text-primary-300 border border-surface-300 dark:border-surface-600 transition-colors cursor-pointer"
+                            onclick={() => applyPreset(preset.hex)}
                             title={preset.desc}
                         >
                             {preset.name}
@@ -285,14 +289,16 @@
 
                     <div class="flex items-center gap-2">
                         <button 
-                            class="flex items-center gap-1 text-xs text-surface-500 hover:text-rose-500 transition-colors"
-                            on:click={clearAll}
+                            type="button"
+                            class="flex items-center gap-1 text-xs text-surface-500 hover:text-rose-500 transition-colors cursor-pointer"
+                            onclick={clearAll}
                         >
                             <Trash2 class="size-3.5" /> Clear
                         </button>
                         <button 
-                            class="flex items-center gap-1 text-xs text-surface-500 hover:text-primary-500 transition-colors"
-                            on:click={() => copyToClipboard('inputHex', inputHex)}
+                            type="button"
+                            class="flex items-center gap-1 text-xs text-surface-500 hover:text-primary-500 transition-colors cursor-pointer"
+                            onclick={() => copyToClipboard('inputHex', inputHex)}
                         >
                             {#if copiedStatus['inputHex']}
                                 <Check class="size-3.5 text-emerald-500" /> Copied
@@ -328,8 +334,9 @@
 
                     {#if parsedNodes.length > 0}
                         <button 
-                            class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:underline font-mono"
-                            on:click={() => copyToClipboard('jsonTree', JSON.stringify(parsedNodes, null, 2))}
+                            type="button"
+                            class="flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:underline font-mono cursor-pointer"
+                            onclick={() => copyToClipboard('jsonTree', JSON.stringify(parsedNodes, null, 2))}
                         >
                             {#if copiedStatus['jsonTree']}
                                 <Check class="size-3.5 text-emerald-500" /> Copied JSON
@@ -378,8 +385,9 @@
                         <Binary class="size-4 text-sky-500" /> Hex Representation
                     </label>
                     <button 
-                        class="text-xs text-surface-500 hover:text-primary-500 flex items-center gap-1"
-                        on:click={() => copyToClipboard('convHex', convHex)}
+                        type="button"
+                        class="text-xs text-surface-500 hover:text-primary-500 flex items-center gap-1 cursor-pointer"
+                        onclick={() => copyToClipboard('convHex', convHex)}
                     >
                         {#if copiedStatus['convHex']}
                             <Check class="size-3.5 text-emerald-500" /> Copied
@@ -392,7 +400,7 @@
                 <textarea 
                     id="conv-hex"
                     value={convHex}
-                    on:input={handleConvHexChange}
+                    oninput={handleConvHexChange}
                     rows="6"
                     placeholder="Enter hex bytes e.g. C8C5D3D3D6..."
                     class="w-full bg-surface-50 dark:bg-surface-900 border border-surface-300 dark:border-surface-700 rounded-2xl p-4 font-mono text-sm tracking-widest text-sky-600 dark:text-sky-400 focus:ring-2 focus:ring-primary-500 focus:outline-none resize-y"
@@ -409,8 +417,9 @@
                         <Type class="size-4 text-amber-500" /> Raw Literal Text ({selectedCodePage})
                     </label>
                     <button 
-                        class="text-xs text-surface-500 hover:text-primary-500 flex items-center gap-1"
-                        on:click={() => copyToClipboard('convLit', convLiteral)}
+                        type="button"
+                        class="text-xs text-surface-500 hover:text-primary-500 flex items-center gap-1 cursor-pointer"
+                        onclick={() => copyToClipboard('convLit', convLiteral)}
                     >
                         {#if copiedStatus['convLit']}
                             <Check class="size-3.5 text-emerald-500" /> Copied
@@ -423,7 +432,7 @@
                 <textarea 
                     id="conv-literal"
                     value={convLiteral}
-                    on:input={handleConvLiteralChange}
+                    oninput={handleConvLiteralChange}
                     rows="6"
                     placeholder="Enter text e.g. HELLO WORLD..."
                     class="w-full bg-surface-50 dark:bg-surface-900 border border-surface-300 dark:border-surface-700 rounded-2xl p-4 font-sans text-sm text-amber-600 dark:text-amber-300 font-medium focus:ring-2 focus:ring-primary-500 focus:outline-none resize-y"
@@ -472,8 +481,9 @@
                 <div class="flex items-center justify-between text-xs font-mono text-surface-500">
                     <span>Generated TLV Hex Output ({selectedCodePage})</span>
                     <button 
-                        class="text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1"
-                        on:click={() => copyToClipboard('builtHex', builtHex)}
+                        type="button"
+                        class="text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1 cursor-pointer"
+                        onclick={() => copyToClipboard('builtHex', builtHex)}
                     >
                         {#if copiedStatus['builtHex']}
                             <Check class="size-3.5 text-emerald-500" /> Copied

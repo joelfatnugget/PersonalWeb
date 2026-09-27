@@ -1,33 +1,39 @@
 <script lang="ts">
     import type { TLVNode } from '$lib/tlv/parser';
     import type { SupportedCodePage } from '$lib/tlv/ebcdic';
-    import { Binary, Layers, ArrowRight, Sparkles, Cpu, Activity, PieChart, CheckCircle2 } from 'lucide-svelte';
+    import { Activity, PieChart, Sparkles } from 'lucide-svelte';
 
-    export let nodes: TLVNode[] = [];
-    export let inputHex: string = '';
-    export let selectedCodePage: SupportedCodePage = 'IBM1047';
+    let { 
+        nodes = [], 
+        inputHex = '', 
+        selectedCodePage = 'IBM1047' 
+    } = $props<{ 
+        nodes?: TLVNode[]; 
+        inputHex?: string; 
+        selectedCodePage?: SupportedCodePage 
+    }>();
 
-    let activeStep = 1;
+    let activeStep = $state(1);
 
-    // Calculate Byte distribution stats
-    $: totalHexLength = inputHex.replace(/[^0-9a-fA-F]/g, '').length;
-    $: totalBytes = Math.floor(totalHexLength / 2);
+    // Calculate Byte distribution stats using Svelte 5 runes
+    let totalHexLength = $derived(inputHex.replace(/[^0-9a-fA-F]/g, '').length);
+    let totalBytes = $derived(Math.floor(totalHexLength / 2));
 
-    $: tagBytesCount = nodes.reduce((acc, n) => acc + (n.tag.length / 2), 0);
-    $: lenBytesCount = nodes.reduce((acc, n) => acc + (n.lengthHex.length / 2), 0);
-    $: valueBytesCount = nodes.reduce((acc, n) => acc + n.length, 0);
+    let tagBytesCount = $derived(nodes.reduce((acc: number, n: TLVNode) => acc + (n.tag.length / 2), 0));
+    let lenBytesCount = $derived(nodes.reduce((acc: number, n: TLVNode) => acc + (n.lengthHex.length / 2), 0));
+    let valueBytesCount = $derived(nodes.reduce((acc: number, n: TLVNode) => acc + n.length, 0));
 
-    $: tagPct = totalBytes > 0 ? Math.round((tagBytesCount / totalBytes) * 100) : 0;
-    $: lenPct = totalBytes > 0 ? Math.round((lenBytesCount / totalBytes) * 100) : 0;
-    $: valPct = totalBytes > 0 ? Math.round((valueBytesCount / totalBytes) * 100) : 0;
+    let tagPct = $derived(totalBytes > 0 ? Math.round((tagBytesCount / totalBytes) * 100) : 0);
+    let lenPct = $derived(totalBytes > 0 ? Math.round((lenBytesCount / totalBytes) * 100) : 0);
+    let valPct = $derived(totalBytes > 0 ? Math.round((valueBytesCount / totalBytes) * 100) : 0);
 
-    const pipelineSteps = [
+    let pipelineSteps = $derived([
         { step: 1, title: 'Byte Stream Ingestion', desc: 'Raw hexadecimal byte stream received into memory buffer' },
         { step: 2, title: 'Tag & Bitmask Decoding', desc: 'Bit 6 (Constructed flag) & Bit 1-5 (Multi-byte tag indicator)' },
         { step: 3, title: 'Length Field Unpacking', desc: 'Short form (<=127 bytes) or Long form (0x81, 0x82 length prefixes)' },
         { step: 4, title: 'IBM Character Set Mapping', desc: `EBCDIC code page translation using selected ${selectedCodePage}` },
         { step: 5, title: 'Structured Tree Generation', desc: 'Hierarchical TLV Node graph produced with metadata' }
-    ];
+    ]);
 </script>
 
 <div class="space-y-6">
@@ -47,8 +53,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
             {#each pipelineSteps as s}
                 <button 
-                    class="p-3 rounded-2xl border text-left transition-all flex flex-col justify-between h-28 relative overflow-hidden {activeStep === s.step ? 'bg-primary-500 text-white border-primary-500 shadow-lg scale-105' : 'bg-surface-50 dark:bg-surface-900 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-300 hover:border-primary-500/40'}"
-                    on:click={() => activeStep = s.step}
+                    type="button"
+                    class="p-3 rounded-2xl border text-left transition-all flex flex-col justify-between h-28 relative overflow-hidden cursor-pointer {activeStep === s.step ? 'bg-primary-500 text-white border-primary-500 shadow-lg scale-105' : 'bg-surface-50 dark:bg-surface-900 border-surface-200 dark:border-surface-700 text-surface-600 dark:text-surface-300 hover:border-primary-500/40'}"
+                    onclick={() => activeStep = s.step}
                 >
                     <div class="flex items-center justify-between text-xs font-mono">
                         <span class="size-5 rounded-full flex items-center justify-center font-bold text-[10px] {activeStep === s.step ? 'bg-white text-primary-600' : 'bg-surface-200 dark:bg-surface-800'}">

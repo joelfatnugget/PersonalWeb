@@ -67,6 +67,11 @@ export interface BlogSpotlight {
     topics: string[];
 }
 
+export interface ResumeSkillCategory {
+    category: string;
+    items: string[];
+}
+
 // --- Data ---
 
 export const personalInfo = {
@@ -306,3 +311,10 @@ export const blogSpotlight: BlogSpotlight = {
     ],
     topics: ["ISO8583", "Payment Architecture", "Security & Risk", "EMV", "Visa VAA", "Message Routing"]
 };
+
+export const resumeSkills: ResumeSkillCategory[] = [
+    { category: "Languages", items: ["Python", "PHP", "JavaScript", "TypeScript", "CSS", "Java"] },
+    { category: "Tools", items: ["Docker", "AWS", "Azure", "MySQL", "Git", "Jenkins"] },
+    { category: "Certifications", items: ["Heicoders AI100/200", "Smartcademy Data Analytics", "Google Cloud Fundamentals"] },
+    { category: "Frameworks & Architecture", items: ["RAG", "REST APIs", "Microservices", "SwiftUI", "Node.js/Express", "React", "SvelteKit"] }
+];

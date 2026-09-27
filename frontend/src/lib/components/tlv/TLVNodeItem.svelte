@@ -1,17 +1,19 @@
 <script lang="ts">
     import type { TLVNode } from '$lib/tlv/parser';
     import { ChevronRight, ChevronDown, Copy, Check, Tag, Binary, Type } from 'lucide-svelte';
+    import TLVNodeItem from './TLVNodeItem.svelte';
 
-    export let node: TLVNode;
-    export let depth = 0;
+    let { node, depth = 0 } = $props<{ node: TLVNode; depth?: number }>();
 
-    let expanded = true;
-    let copied = false;
+    let expanded = $state(true);
+    let copied = $state(false);
 
     function copyToClipboard(text: string) {
-        navigator.clipboard.writeText(text);
-        copied = true;
-        setTimeout(() => (copied = false), 2000);
+        if (typeof navigator !== 'undefined' && navigator.clipboard) {
+            navigator.clipboard.writeText(text);
+            copied = true;
+            setTimeout(() => (copied = false), 2000);
+        }
     }
 
     function toggleExpand() {
@@ -25,16 +27,18 @@
     <!-- Header / Summary Bar -->
     <div 
         class="flex flex-wrap items-center justify-between gap-3 p-3.5 sm:p-4 select-none cursor-pointer"
-        on:click={toggleExpand}
+        onclick={toggleExpand}
         role="button"
         tabindex="0"
-        on:keydown={(e) => e.key === 'Enter' && toggleExpand()}
+        onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(); } }}
     >
         <div class="flex items-center gap-2.5 min-w-0">
             {#if node.isConstructed && node.children && node.children.length > 0}
                 <button 
-                    class="p-1 rounded-md text-surface-500 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
+                    type="button"
+                    class="p-1 rounded-md text-surface-500 hover:text-surface-900 dark:hover:text-surface-100 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors cursor-pointer"
                     aria-label={expanded ? "Collapse node" : "Expand node"}
+                    onclick={(e) => { e.stopPropagation(); toggleExpand(); }}
                 >
                     {#if expanded}
                         <ChevronDown class="size-4" />
@@ -72,9 +76,11 @@
 
             <!-- Copy raw hex -->
             <button 
-                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
-                on:click|stopPropagation={() => copyToClipboard(node.rawHex)}
+                type="button"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-lg text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors cursor-pointer"
+                onclick={(e) => { e.stopPropagation(); copyToClipboard(node.rawHex); }}
                 title="Copy complete raw hex"
+                aria-label="Copy complete raw hex"
             >
                 {#if copied}
                     <Check class="size-3.5 text-emerald-500" />
@@ -120,7 +126,7 @@
                     Child Tags ({node.children.length})
                 </div>
                 {#each node.children as child}
-                    <svelte:self node={child} depth={depth + 1} />
+                    <TLVNodeItem node={child} depth={depth + 1} />
                 {/each}
             </div>
         {/if}

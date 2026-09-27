@@ -3,7 +3,7 @@
     import Icon from '@iconify/svelte';
 </script>
 
-<footer class="bg-surface-100-800-token p-10 mt-auto border-t border-surface-200/50 dark:border-surface-800/50">
+<footer class="bg-surface-100 dark:bg-surface-900 p-10 mt-auto border-t border-surface-200/50 dark:border-surface-800/50">
     <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         <div class="text-center md:text-left space-y-1">
             <p class="font-black text-xl text-surface-900 dark:text-white tracking-tight">Joel Tan</p>

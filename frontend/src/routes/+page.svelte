@@ -65,11 +65,8 @@
             use:scrollReveal={{ delay: 100 }}
             class="motion-item fade-up font-extrabold tracking-tight text-5xl sm:text-7xl lg:text-8xl leading-[1.08] text-surface-900 dark:text-white"
         >
-            <span class="bg-gradient-to-r from-surface-900 via-surface-700 to-primary-600 dark:from-white dark:via-surface-200 dark:to-primary-400 bg-clip-text text-transparent">
-                {personalInfo.name}
-            </span>
-            <br />
-            <span class="text-surface-500 dark:text-surface-400 text-2xl sm:text-4xl lg:text-5xl font-light tracking-normal block mt-3">
+            {personalInfo.name}
+            <span class="text-surface-600 dark:text-surface-400 text-2xl sm:text-4xl lg:text-5xl font-light tracking-normal block mt-3">
                 {personalInfo.tagline}
             </span>
         </h1>
@@ -89,7 +86,7 @@
         >
             <a 
                 href="/projects" 
-                class="group relative inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-white transition-all duration-300 bg-primary-600 rounded-2xl shadow-lg shadow-primary-500/25 hover:bg-primary-700 hover:scale-105"
+                class="group relative inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-white transition-all duration-300 bg-primary-600 rounded-2xl shadow-lg shadow-primary-500/25 hover:bg-primary-700 hover:scale-105 cursor-pointer"
             >
                 Explore Projects
                 <ArrowRight class="ml-2 size-5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -97,9 +94,9 @@
 
             <a 
                 href="https://blog.joelfatnugget.xyz/" 
-                target="_blank"
+                target="_blank" 
                 rel="noopener noreferrer"
-                class="group inline-flex items-center justify-center px-8 py-3.5 text-base font-bold transition-all duration-300 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border border-surface-200 dark:border-surface-800 rounded-2xl hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-900 dark:text-white hover:scale-105 shadow-sm"
+                class="group inline-flex items-center justify-center px-8 py-3.5 text-base font-bold transition-all duration-300 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border border-surface-200 dark:border-surface-800 rounded-2xl hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-900 dark:text-white hover:scale-105 shadow-sm cursor-pointer"
             >
                 Read Blog
                 <BookOpen class="ml-2 size-4 text-primary-500" />
@@ -107,55 +104,43 @@
             
             <a 
                 href="/experience" 
-                class="group inline-flex items-center justify-center px-8 py-3.5 text-base font-bold transition-all duration-300 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border border-surface-200 dark:border-surface-800 rounded-2xl hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-900 dark:text-white hover:scale-105 shadow-sm"
+                class="group inline-flex items-center justify-center px-8 py-3.5 text-base font-bold transition-all duration-300 bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border border-surface-200 dark:border-surface-800 rounded-2xl hover:bg-surface-100 dark:hover:bg-surface-800 text-surface-900 dark:text-white hover:scale-105 shadow-sm cursor-pointer"
             >
                 View Experience
                 <Briefcase class="ml-2 size-4 text-primary-500" />
             </a>
         </div>
 
-        <!-- 3D PERSPECTIVE CODE TERMINAL SHOWCASE (SCROLL TRIGGERED) -->
+        <!-- High-Signal Core Competencies & Credentials Panel -->
         <div 
             use:scrollReveal={{ delay: 100 }}
-            class="motion-item perspective-tilt w-full max-w-3xl mt-12 text-left"
+            class="motion-item perspective-tilt w-full max-w-3xl mt-10 text-left"
         >
-            <div class="bg-surface-950 border border-surface-800 rounded-2xl overflow-hidden shadow-2xl transition-all duration-700 hover:shadow-primary-500/10">
-                <!-- Terminal Bar -->
-                <div class="px-4 py-3 bg-surface-900/90 border-b border-surface-800 flex items-center justify-between">
+            <div class="bg-surface-50 dark:bg-surface-950 border border-surface-200 dark:border-surface-800 rounded-2xl p-6 sm:p-8 shadow-xl transition-all duration-500">
+                <div class="flex items-center justify-between pb-4 border-b border-surface-200 dark:border-surface-800">
                     <div class="flex items-center gap-2">
-                        <span class="size-3 rounded-full bg-red-500/80"></span>
-                        <span class="size-3 rounded-full bg-yellow-500/80"></span>
-                        <span class="size-3 rounded-full bg-green-500/80"></span>
-                        <span class="text-xs font-mono text-surface-400 ml-2">joeltan.dev — zsh</span>
+                        <span class="size-2.5 rounded-full bg-emerald-500"></span>
+                        <span class="text-xs font-mono font-semibold uppercase tracking-wider text-surface-600 dark:text-surface-400">Production Engineer Profile</span>
                     </div>
-                    <div class="flex items-center gap-2 text-xs font-mono text-surface-400">
-                        <Terminal class="size-3.5 text-primary-400" />
-                        <span>v2.5</span>
-                    </div>
+                    <span class="text-xs font-mono text-primary-600 dark:text-primary-400 font-bold">Visa Inc • Singapore</span>
                 </div>
 
-                <!-- Code Content -->
-                <div class="p-6 font-mono text-xs sm:text-sm text-surface-200 leading-relaxed overflow-x-auto space-y-2">
-                    <div class="text-surface-500">// Software Engineer & Fullstack Specialist</div>
-                    <div>
-                        <span class="text-purple-400">const</span> <span class="text-blue-400">developer</span> = &#123;
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-5">
+                    <div class="p-3.5 rounded-xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800">
+                        <div class="text-[11px] font-mono text-surface-500 uppercase tracking-wide">Current Role</div>
+                        <div class="text-sm font-bold text-surface-900 dark:text-white mt-1">Fullstack Developer</div>
+                        <div class="text-xs text-primary-600 dark:text-primary-400 mt-0.5">GenAI & Microservices</div>
                     </div>
-                    <div class="pl-4">
-                        <span class="text-amber-300">name</span>: <span class="text-emerald-400">"{personalInfo.name}"</span>,
+                    <div class="p-3.5 rounded-xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800">
+                        <div class="text-[11px] font-mono text-surface-500 uppercase tracking-wide">Verified Impact</div>
+                        <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1">98% QA Efficiency</div>
+                        <div class="text-xs text-surface-500 mt-0.5">Automated test pipelines</div>
                     </div>
-                    <div class="pl-4">
-                        <span class="text-amber-300">location</span>: <span class="text-emerald-400">"{personalInfo.location}"</span>,
+                    <div class="p-3.5 rounded-xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-800">
+                        <div class="text-[11px] font-mono text-surface-500 uppercase tracking-wide">Primary Stack</div>
+                        <div class="text-sm font-bold text-surface-900 dark:text-white mt-1">Python • React • TS</div>
+                        <div class="text-xs text-surface-500 mt-0.5">Docker • SvelteKit • Cloud</div>
                     </div>
-                    <div class="pl-4">
-                        <span class="text-amber-300">latestRole</span>: <span class="text-emerald-400">"Fullstack Developer @ Visa Inc"</span>,
-                    </div>
-                    <div class="pl-4">
-                        <span class="text-amber-300">coreTech</span>: [<span class="text-emerald-400">"Python"</span>, <span class="text-emerald-400">"React"</span>, <span class="text-emerald-400">"TypeScript"</span>, <span class="text-emerald-400">"Docker"</span>, <span class="text-emerald-400">"Next.js"</span>],
-                    </div>
-                    <div class="pl-4">
-                        <span class="text-amber-300">impact</span>: [<span class="text-emerald-400">"98% QA Efficiency Gain"</span>, <span class="text-emerald-400">"1st Place Hackathon Winner"</span>]
-                    </div>
-                    <div>&#125;;</div>
                 </div>
             </div>
         </div>
@@ -432,16 +417,11 @@
     /* CSS Motion Utilities for Scroll Reveal */
     .motion-item {
         opacity: 0;
-        will-change: transform, opacity;
         transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .fade-up {
         transform: translateY(40px);
-    }
-
-    .fade-down {
-        transform: translateY(-20px);
     }
 
     .zoom-in {
@@ -455,5 +435,13 @@
     :global(.motion-item.is-visible) {
         opacity: 1;
         transform: translateY(0) rotateX(0deg) scale(1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .motion-item {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
     }
 </style>

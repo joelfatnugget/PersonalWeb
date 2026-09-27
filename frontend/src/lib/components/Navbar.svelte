@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+    import { page } from '$app/stores';
     import { onMount } from 'svelte';
-    import { Search, Sun, Moon, Command, ExternalLink } from 'lucide-svelte';
+    import { Search, Sun, Moon, ExternalLink, Menu, X } from 'lucide-svelte';
     import CommandPalette from './CommandPalette.svelte';
 
     const navLinks = [
@@ -14,6 +14,7 @@
     ];
 
     let commandOpen = $state(false);
+    let mobileMenuOpen = $state(false);
     let isDarkMode = $state(false);
 
     function checkDarkMode() {
@@ -37,23 +38,39 @@
         }
     }
 
+    function closeMobileMenu() {
+        mobileMenuOpen = false;
+    }
+
+    function handleGlobalKeydown(e: KeyboardEvent) {
+        if (e.key === 'Escape' && mobileMenuOpen) {
+            mobileMenuOpen = false;
+        }
+    }
+
     onMount(() => {
         checkDarkMode();
+        window.addEventListener('keydown', handleGlobalKeydown);
+        return () => window.removeEventListener('keydown', handleGlobalKeydown);
     });
 </script>
 
-<div class="fixed top-0 left-0 right-0 z-40 bg-white/70 dark:bg-black/70 backdrop-blur-md border-b border-surface-200/50 dark:border-surface-800/50 transition-colors duration-300">
+<div class="fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-surface-200/60 dark:border-surface-800/60 transition-colors duration-300">
     <div class="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         
         <!-- Brand Logo -->
-        <a href="/" class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-80 transition-opacity flex items-center gap-1 text-surface-900 dark:text-white">
+        <a 
+            href="/" 
+            class="text-xl md:text-2xl font-black tracking-tighter hover:opacity-80 transition-opacity flex items-center gap-1 text-surface-900 dark:text-white"
+            onclick={closeMobileMenu}
+        >
             Joel<span class="text-primary-500 font-extrabold">.</span>Tan
         </a>
 
         <!-- Desktop Navigation & Quick Tools -->
-        <div class="flex items-center gap-4 md:gap-6">
-            <!-- Nav Links -->
-            <nav class="hidden md:flex items-center gap-6">
+        <div class="flex items-center gap-2 sm:gap-4 md:gap-6">
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-6" aria-label="Desktop primary navigation">
                 {#each navLinks as link}
                     <a 
                         href={link.href} 
@@ -77,11 +94,11 @@
             <!-- Command Palette Trigger Button -->
             <button 
                 onclick={() => commandOpen = true}
-                class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-100 dark:bg-surface-800/80 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300 text-xs font-medium border border-surface-200/80 dark:border-surface-700/80 transition-all duration-200 group cursor-pointer"
+                class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-surface-100 dark:bg-surface-800/80 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300 text-xs font-medium border border-surface-200/80 dark:border-surface-700/80 transition-all duration-200 group cursor-pointer"
                 aria-label="Open Command Palette"
             >
                 <Search class="size-3.5 group-hover:scale-110 transition-transform text-primary-500" />
-                <span class="hidden sm:inline">Search...</span>
+                <span class="hidden sm:inline">Search</span>
                 <kbd class="font-mono text-[10px] bg-white dark:bg-surface-900 px-1.5 py-0.5 rounded border border-surface-300 dark:border-surface-600 shadow-xs text-surface-500">
                     ⌘K
                 </kbd>
@@ -99,8 +116,50 @@
                     <Moon class="size-4 text-slate-700 animate-in spin-in-90 duration-300" />
                 {/if}
             </button>
+
+            <!-- Mobile Hamburger Toggle Button -->
+            <button
+                onclick={() => mobileMenuOpen = !mobileMenuOpen}
+                class="md:hidden p-2 rounded-xl bg-surface-100 dark:bg-surface-800 hover:bg-surface-200 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-200 border border-surface-200 dark:border-surface-700 transition-all duration-200 cursor-pointer"
+                aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-nav-drawer"
+            >
+                {#if mobileMenuOpen}
+                    <X class="size-4" />
+                {:else}
+                    <Menu class="size-4" />
+                {/if}
+            </button>
         </div>
     </div>
+
+    <!-- Mobile Navigation Drawer Overlay -->
+    {#if mobileMenuOpen}
+        <div 
+            id="mobile-nav-drawer"
+            class="md:hidden border-t border-surface-200/80 dark:border-surface-800/80 bg-white/95 dark:bg-surface-950/95 backdrop-blur-xl px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-200 shadow-xl"
+            role="region"
+            aria-label="Mobile Navigation Menu"
+        >
+            <nav class="flex flex-col space-y-1">
+                {#each navLinks as link}
+                    <a 
+                        href={link.href}
+                        target={link.external ? '_blank' : undefined}
+                        rel={link.external ? 'noopener noreferrer' : undefined}
+                        onclick={closeMobileMenu}
+                        class="px-4 py-3 rounded-xl text-base font-semibold transition-colors flex items-center justify-between {$page.url.pathname === link.href ? 'bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20' : 'text-surface-700 dark:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800'}"
+                    >
+                        <span>{link.label}</span>
+                        {#if link.external}
+                            <ExternalLink class="size-4 text-surface-400" />
+                        {/if}
+                    </a>
+                {/each}
+            </nav>
+        </div>
+    {/if}
 </div>
 
 <!-- Command Palette Modal -->

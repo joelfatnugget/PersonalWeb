@@ -1,18 +1,18 @@
 <script lang="ts">
     import { getCodePageTable, CODE_PAGES, type SupportedCodePage, type CodePageByteEntry, type CodePageInfo } from '$lib/tlv/ebcdic';
-    import { Search, Info, Check, Copy, Grid, ArrowRightLeft } from 'lucide-svelte';
+    import { Search, Grid } from 'lucide-svelte';
 
-    export let selectedCodePage: SupportedCodePage = 'IBM1047';
+    let { selectedCodePage = 'IBM1047' } = $props<{ selectedCodePage?: SupportedCodePage }>();
 
-    let searchQuery = '';
-    let selectedCell: CodePageByteEntry | null = null;
-    let compareCodePage: SupportedCodePage = 'ASCII';
+    let searchQuery = $state('');
+    let selectedCell = $state<CodePageByteEntry | null>(null);
+    let compareCodePage = $state<SupportedCodePage>('ASCII');
 
-    $: table = getCodePageTable(selectedCodePage);
-    $: compareTable = getCodePageTable(compareCodePage);
-    $: currentCodePageInfo = CODE_PAGES.find(cp => cp.id === selectedCodePage) as CodePageInfo | undefined;
+    let table = $derived(getCodePageTable(selectedCodePage));
+    let compareTable = $derived(getCodePageTable(compareCodePage));
+    let currentCodePageInfo = $derived(CODE_PAGES.find(cp => cp.id === selectedCodePage) as CodePageInfo | undefined);
 
-    $: filteredTable = table.filter(entry => {
+    let filteredTable = $derived(table.filter(entry => {
         if (!searchQuery) return true;
         const q = searchQuery.toLowerCase().trim();
         return (
@@ -21,7 +21,7 @@
             entry.binary.includes(q) ||
             entry.char.toLowerCase().includes(q)
         );
-    });
+    }));
 
     function selectEntry(entry: CodePageByteEntry) {
         selectedCell = entry;
@@ -60,6 +60,7 @@
                     type="text"
                     bind:value={searchQuery}
                     placeholder="Search byte e.g. C1, A, 193..."
+                    aria-label="Search byte code or character"
                     class="w-full bg-surface-50 dark:bg-surface-900 border border-surface-300 dark:border-surface-700 rounded-xl pl-9 pr-3 py-1.5 text-xs font-mono focus:ring-2 focus:ring-primary-500 focus:outline-none"
                 />
             </div>
@@ -79,18 +80,18 @@
     <!-- 16x16 Interactive Byte Matrix Grid -->
     <div class="bg-surface-100/90 dark:bg-surface-800/80 p-4 sm:p-5 rounded-3xl border border-surface-200 dark:border-surface-700/80 shadow-lg overflow-x-auto">
         <div class="min-w-[640px]">
-            <!-- Column Header (0x0 to 0xF) -->
-            <div class="grid grid-cols-17 gap-1 mb-2 text-center text-[11px] font-mono text-surface-400 font-semibold">
+            <!-- Column Header (0x0 to 0xF) using valid 17-column CSS grid -->
+            <div class="grid grid-cols-[repeat(17,minmax(0,1fr))] gap-1 mb-2 text-center text-[11px] font-mono text-surface-400 font-semibold">
                 <div class="text-primary-500">Row</div>
                 {#each [0,1,2,3,4,5,6,7,8,9,'A','B','C','D','E','F'] as col}
                     <div>+{col}</div>
                 {/each}
             </div>
 
-            <!-- 16 Rows (0x0_ to 0xF_) -->
+            <!-- 16 Rows (0x0_ to 0xF_) using valid 17-column CSS grid -->
             {#each Array(16) as _, rowIndex}
                 {@const rowHex = rowIndex.toString(16).toUpperCase()}
-                <div class="grid grid-cols-17 gap-1 mb-1 items-center">
+                <div class="grid grid-cols-[repeat(17,minmax(0,1fr))] gap-1 mb-1 items-center">
                     <div class="text-[11px] font-mono font-bold text-primary-500 text-center select-none">
                         0x{rowHex}_
                     </div>
@@ -101,9 +102,11 @@
                         {@const isSelected = selectedCell?.dec === entry.dec}
 
                         <button 
-                            class="h-10 rounded-lg border text-center transition-all flex flex-col items-center justify-center p-0.5 relative group {categoryColors[entry.category]} {isSelected ? 'ring-2 ring-primary-500 scale-105 shadow-md z-10' : 'hover:scale-105 hover:shadow'}"
-                            on:click={() => selectEntry(entry)}
+                            type="button"
+                            class="h-10 rounded-lg border text-center transition-all flex flex-col items-center justify-center p-0.5 relative group cursor-pointer {categoryColors[entry.category]} {isSelected ? 'ring-2 ring-primary-500 scale-105 shadow-md z-10' : 'hover:scale-105 hover:shadow'}"
+                            onclick={() => selectEntry(entry)}
                             title="Click to view byte 0x{entry.hex} ({entry.mnemonic || entry.char}) details"
+                            aria-label="Byte 0x{entry.hex} {entry.mnemonic || entry.char}"
                         >
                             <span class="text-[9px] font-mono opacity-60 text-surface-500 dark:text-surface-400">
                                 {entry.hex}

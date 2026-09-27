@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { personalInfo, experiences, education, achievements } from '$lib/data';
+    import { personalInfo, experiences, education, achievements, resumeSkills } from '$lib/data';
     import { formatDate } from '$lib/utils';
     import { Printer, ExternalLink } from 'lucide-svelte';
 </script>
@@ -8,7 +8,7 @@
     
     <!-- Controls -->
     <div class="w-full max-w-[210mm] flex justify-end mb-4 no-print">
-        <a href="/Joel_Tan_Resume.pdf" target="_blank" class="btn variant-filled-primary">
+        <a href="/Joel_Tan_Resume.pdf" target="_blank" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold text-sm inline-flex items-center shadow-md transition-colors">
             <Printer class="mr-2 size-4" />
             Print / Download PDF
         </a>
@@ -86,10 +86,9 @@
         <section class="mb-5">
             <h2 class="text-lg font-bold uppercase border-b border-black mb-2">Skills & Interests</h2>
             <ul class="list-disc list-outside ml-5 space-y-1">
-                <li><span class="font-bold">Languages:</span> Python, PHP, JavaScript, CSS, Java</li>
-                <li><span class="font-bold">Tools:</span> Docker, AWS, Azure, MySQL, Git, Jenkins</li>
-                <li><span class="font-bold">Certifications:</span> Heicoders AI100/200, Smartcademy Data Analytics, Google Cloud Fundamentals</li>
-                <li><span class="font-bold">Frameworks & Architecture:</span> RAG, REST APIs, Microservices, SwiftUI, Node.js/Express, React</li>
+                {#each resumeSkills as group}
+                    <li><span class="font-bold">{group.category}:</span> {group.items.join(', ')}</li>
+                {/each}
             </ul>
         </section>
 

@@ -8,8 +8,8 @@
     } from 'lucide-svelte';
     import { fly } from 'svelte/transition';
 
-    let searchQuery = '';
-    let selectedCategory = 'All';
+    let searchQuery = $state('');
+    let selectedCategory = $state('All');
 
     const categories = ['All', 'Mainframe & Banking'];
 
@@ -29,14 +29,14 @@
         }
     ];
 
-    $: filteredApps = applications.filter(app => {
+    let filteredApps = $derived(applications.filter(app => {
         const matchesCategory = selectedCategory === 'All' || app.category === selectedCategory;
         const matchesQuery = searchQuery === '' || 
             app.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
             app.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
             app.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
         return matchesCategory && matchesQuery;
-    });
+    }));
 </script>
 
 <svelte:head>
@@ -56,7 +56,7 @@
             <Cpu class="size-3.5" />
             <span>Developer Applications Showcase Suite</span>
         </div>
-        <h1 class="h1 font-black mb-4 tracking-tighter">
+        <h1 class="h1 font-black mb-4 tracking-tighter text-4xl sm:text-5xl text-surface-900 dark:text-white">
             Application <span class="text-primary-500">Showcase Hub</span>
         </h1>
         <p class="text-lg text-surface-600 dark:text-surface-300 font-medium">
@@ -70,8 +70,9 @@
         <div class="flex flex-wrap items-center gap-2">
             {#each categories as cat}
                 <button 
-                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all {selectedCategory === cat ? 'bg-primary-500 text-white shadow-md' : 'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700 border border-surface-200 dark:border-surface-700'}"
-                    on:click={() => selectedCategory = cat}
+                    type="button"
+                    class="px-4 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer {selectedCategory === cat ? 'bg-primary-500 text-white shadow-md' : 'bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-700 border border-surface-200 dark:border-surface-700'}"
+                    onclick={() => selectedCategory = cat}
                 >
                     {cat}
                 </button>
@@ -85,6 +86,7 @@
                 type="text"
                 bind:value={searchQuery}
                 placeholder="Search applications..."
+                aria-label="Search applications"
                 class="w-full bg-surface-100/80 dark:bg-surface-800/80 border border-surface-200 dark:border-surface-700 rounded-xl pl-10 pr-4 py-2 text-xs font-medium focus:ring-2 focus:ring-primary-500 focus:outline-none"
             />
         </div>
@@ -93,6 +95,7 @@
     <!-- Applications Showcase Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {#each filteredApps as app, i}
+            {@const IconComponent = app.icon}
             <div 
                 in:fly={{ y: 30, duration: 800, delay: i * 100 }}
                 class="group relative rounded-3xl bg-surface-100/80 dark:bg-surface-800/60 backdrop-blur-xl border border-surface-200 dark:border-surface-700/80 p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
@@ -100,7 +103,7 @@
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <div class="p-3.5 rounded-2xl bg-primary-500/10 text-primary-500 border border-primary-500/20 group-hover:scale-110 transition-transform">
-                            <svelte:component this={app.icon} class="size-7" />
+                            <IconComponent class="size-7" />
                         </div>
                         <span class="px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 {app.badgeColor}">
                             <CheckCircle2 class="size-3.5" />
@@ -133,7 +136,7 @@
                 <div class="pt-6 mt-4 border-t border-surface-200/60 dark:border-surface-700/50">
                     <a 
                         href={app.path} 
-                        class="btn variant-filled-primary w-full group/btn font-semibold text-sm rounded-xl py-2.5 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20"
+                        class="w-full group/btn font-semibold text-sm rounded-xl py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 transition-all cursor-pointer"
                     >
                         <span>Launch Application</span>
                         <ArrowRight class="size-4 transition-transform group-hover/btn:translate-x-1" />

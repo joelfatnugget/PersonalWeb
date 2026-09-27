@@ -129,8 +129,12 @@
                             class="relative p-6 sm:p-8 rounded-2xl bg-white dark:bg-surface-900/90 backdrop-blur-md border border-surface-200/80 dark:border-surface-800 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden group/card
                             {isHighlighted ? 'ring-2 ring-primary-500 shadow-primary-500/20' : ''}
                             {matchesHoveredSkill ? 'border-primary-500 dark:border-primary-400 ring-1 ring-primary-500/30' : ''}"
-                            style="border-left: 5px solid {job.color || '#3b82f6'};"
                         >
+                            <!-- Subtle Brand Accent Bar -->
+                            <div 
+                                class="absolute top-0 left-0 right-0 h-1"
+                                style="background-color: {job.color || 'var(--color-primary-500)'};"
+                            ></div>
                             <!-- Watermark Logo -->
                             {#if job.logo}
                                 <img 
