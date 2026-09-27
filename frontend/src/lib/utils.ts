@@ -248,4 +248,41 @@ export function getBloodStockStatus(level: string): BloodStockStatusInfo {
     };
 }
 
+export interface BloodDataEntry {
+    type: string;
+    level: string;
+}
+
+export interface ParsedBloodData {
+    bloodData: BloodDataEntry[];
+    updatedAt: string;
+}
+
+export function parseBloodDataFromMarkdown(markdownText: string): ParsedBloodData {
+    if (!markdownText || typeof markdownText !== 'string') {
+        return { bloodData: [], updatedAt: 'Unknown Date' };
+    }
+
+    const officialMatch = markdownText.match(/official update:\s*(.*?)(?:\n|\r|$)/i);
+    const updateMatch = markdownText.match(/Updated: (.*?)\)/i);
+    const updatedAt = officialMatch
+        ? officialMatch[1].trim()
+        : (updateMatch ? updateMatch[1].trim() : 'Unknown Date');
+
+    const bloodData: BloodDataEntry[] = [];
+    const lines = markdownText.split('\n');
+    for (const line of lines) {
+        const match = line.trim().match(/^\|\s*([A-Z]{1,2}[+-])\s*\|\s*(\w+)\s*\|$/);
+        if (match) {
+            bloodData.push({
+                type: match[1],
+                level: match[2]
+            });
+        }
+    }
+
+    return { bloodData, updatedAt };
+}
+
+
 

@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { parseBlogRss } from '$lib/utils';
+import { parseBlogRss, parseBloodDataFromMarkdown } from '$lib/utils';
 import { blogSpotlight } from '$lib/data';
 
 export const load: PageServerLoad = async ({ fetch }) => {
@@ -19,25 +19,15 @@ export const load: PageServerLoad = async ({ fetch }) => {
     }
 
     // 2. Fetch Blood Bank Level Data
-    let bloodData = [];
+    let bloodData: Array<{ type: string; level: string }> = [];
     let updatedAt = 'Unknown Date';
     try {
         const response = await fetch('https://raw.githubusercontent.com/joelfatnugget/BloodBankLevel/main/README.md');
         if (response.ok) {
             const text = await response.text();
-            const updateMatch = text.match(/Updated: (.*?)\)/);
-            updatedAt = updateMatch ? updateMatch[1].trim() : 'Unknown Date';
-
-            const lines = text.split('\n');
-            for (const line of lines) {
-                const match = line.trim().match(/^\|\s*([A-Z]{1,2}[+-])\s*\|\s*(\w+)\s*\|$/);
-                if (match) {
-                    bloodData.push({
-                        type: match[1],
-                        level: match[2]
-                    });
-                }
-            }
+            const parsed = parseBloodDataFromMarkdown(text);
+            bloodData = parsed.bloodData;
+            updatedAt = parsed.updatedAt;
         }
     } catch (error) {
         console.error('Error fetching blood data:', error);

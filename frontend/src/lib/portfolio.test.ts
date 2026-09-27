@@ -265,5 +265,53 @@ describe('Portfolio Utility Functions', () => {
             expect(critical.badgeClass).toContain('red');
         });
     });
+
+    describe('parseBloodDataFromMarkdown', () => {
+        const sampleMarkdown = `
+Singapore Blood Levels
+ Please donate to the Blood Bank if you are able to do so!
+================================================================================================================================
+
+### Blood Levels (Updated: 28 Sep 2026 00:24:16 GMT+8)
+> Red Cross Singapore official update: 25 September 2026
+
+| Blood Type | Level     |
+|------------|-----------|
+| A+     | Healthy |
+| B+     | High |
+| B-     | Moderate |
+| O-     | Critical |
+        `;
+
+        it('extracts official update timestamp and blood stock records', async () => {
+            const { parseBloodDataFromMarkdown } = await import('./utils');
+            const result = parseBloodDataFromMarkdown(sampleMarkdown);
+            expect(result.updatedAt).toBe('25 September 2026');
+            expect(result.bloodData).toEqual([
+                { type: 'A+', level: 'Healthy' },
+                { type: 'B+', level: 'High' },
+                { type: 'B-', level: 'Moderate' },
+                { type: 'O-', level: 'Critical' }
+            ]);
+        });
+
+        it('falls back to scraper timestamp when official update line is absent', async () => {
+            const { parseBloodDataFromMarkdown } = await import('./utils');
+            const legacyMarkdown = `### Blood Levels (Updated: 27 Sep 2026 12:00:26 GMT+8)
+| Blood Type | Level     |
+|------------|-----------|
+| A+     | Healthy |`;
+            const result = parseBloodDataFromMarkdown(legacyMarkdown);
+            expect(result.updatedAt).toBe('27 Sep 2026 12:00:26 GMT+8');
+            expect(result.bloodData).toHaveLength(1);
+        });
+
+        it('handles empty or malformed markdown gracefully', async () => {
+            const { parseBloodDataFromMarkdown } = await import('./utils');
+            const result = parseBloodDataFromMarkdown('');
+            expect(result.updatedAt).toBe('Unknown Date');
+            expect(result.bloodData).toEqual([]);
+        });
+    });
 });
 
