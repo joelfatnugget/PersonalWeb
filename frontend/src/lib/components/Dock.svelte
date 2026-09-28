@@ -12,13 +12,13 @@
     Desktop (md): Fixed left, vertical, centered vertically
 -->
 <div class="fixed z-50 transition-all duration-300
-    bottom-4 left-1/2 -translate-x-1/2 flex-row items-end max-w-[95vw]
-    md:bottom-auto md:top-1/2 md:left-6 md:-translate-y-1/2 md:-translate-x-0 md:flex-col md:items-start
+    bottom-4 left-1/2 -translate-x-1/2 flex items-center max-w-[95vw]
+    md:bottom-auto md:top-1/2 md:left-5 md:-translate-y-1/2 md:translate-x-0 md:flex-col md:items-start
 " role="navigation" aria-label="Quick Actions Dock">
     <div class="
-        flex gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-white/70 dark:bg-black/70 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-2xl transition-all duration-300
+        flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 bg-white/80 dark:bg-surface-900/80 backdrop-blur-xl border border-surface-200/80 dark:border-surface-700/80 shadow-2xl transition-all duration-300
         rounded-2xl
-        md:flex-col md:gap-3 md:p-3
+        md:flex-col md:gap-2.5 md:p-2.5
     ">
     
         <!-- Home -->
@@ -39,8 +39,8 @@
             ">Home</span>
         </a>
 
-        <!-- Divider for desktop visual separation -->
-        <div class="hidden md:block w-full h-px bg-surface-300 dark:bg-surface-700 my-0.5"></div>
+        <!-- Divider -->
+        <div class="w-px h-5 sm:h-6 md:w-full md:h-px bg-surface-300 dark:bg-surface-700 mx-0.5 sm:mx-1 md:mx-0 md:my-0.5"></div>
 
         <!-- Socials -->
         {#each socials as social, i}
@@ -64,7 +64,7 @@
         {/each}
 
         <!-- Divider -->
-        <div class="hidden md:block w-full h-px bg-surface-300 dark:bg-surface-700 my-0.5"></div>
+        <div class="w-px h-5 sm:h-6 md:w-full md:h-px bg-surface-300 dark:bg-surface-700 mx-0.5 sm:mx-1 md:mx-0 md:my-0.5"></div>
 
         <!-- Applications Shortcut -->
         <a 

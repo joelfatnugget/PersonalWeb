@@ -185,7 +185,7 @@
                                     <div class="size-2.5 rounded-full bg-yellow-500/80"></div>
                                     <div class="size-2.5 rounded-full bg-green-500/80"></div>
                                 </div>
-                                <span class="truncate max-w-[200px] text-surface-300">{featuredApp.previewSnippet.title}</span>
+                                <span class="truncate text-surface-300">{featuredApp.previewSnippet.title}</span>
                                 <span class="text-[10px] px-1.5 py-0.5 rounded bg-surface-800 text-surface-400">DEMO</span>
                             </div>
 
@@ -193,7 +193,7 @@
                             <div class="space-y-1.5">
                                 <div class="text-[10px] uppercase tracking-wider text-surface-400 flex items-center justify-between">
                                     <span>{featuredApp.previewSnippet.inputLabel}</span>
-                                    <span class="text-primary-400 font-bold">38 BYTES</span>
+                                    <span class="text-primary-400 font-bold">{Math.floor(featuredApp.previewSnippet.inputValue.replace(/[^0-9a-fA-F]/g, '').length / 2)} BYTES</span>
                                 </div>
                                 <div class="p-2.5 rounded-xl bg-surface-900 border border-surface-800/80 font-mono text-[11px] text-emerald-400 break-all leading-relaxed select-all">
                                     {featuredApp.previewSnippet.inputValue}

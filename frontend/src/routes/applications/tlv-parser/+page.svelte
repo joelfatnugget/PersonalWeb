@@ -32,14 +32,26 @@
     let activeTab = $state<'parser' | 'visualizer' | 'matrix' | 'converter' | 'builder'>('parser');
 
     // Parser State
-    let inputHex = $state('6F1E8407A0000000031010A513500BC8C5D3D3D640E6D6D9D3C49F0206000000001000');
+    let inputHex = $state('6F218407A0000000031010A516500BC8C5D3D3D640E6D6D9D3C49F0206000000001000');
 
-    let parsedNodes = $state<TLVNode[]>([]);
-    let parseError = $state('');
+    let parseResult = $derived.by(() => {
+        if (!inputHex.trim()) {
+            return { nodes: [] as TLVNode[], error: '' };
+        }
+        try {
+            const nodes = parseTLV(inputHex, { encoding: selectedCodePage });
+            return { nodes, error: '' };
+        } catch (err: any) {
+            return { nodes: [] as TLVNode[], error: err?.message || 'Error parsing TLV structure' };
+        }
+    });
+
+    let parsedNodes = $derived(parseResult.nodes);
+    let parseError = $derived(parseResult.error);
 
     // Converter State (Hex <-> Literal)
     let convHex = $state('C8C5D3D3D640E6D6D9D3C440F1F2F3'); // "HELLO WORLD 123" in IBM037 EBCDIC
-    let convLiteral = $state('');
+    let convLiteral = $state('HELLO WORLD 123');
     let convDirection = $state<'hexToLiteral' | 'literalToHex'>('hexToLiteral');
 
     // Builder State
@@ -56,22 +68,6 @@
             copiedStatus[key] = false;
         }, 2000);
     }
-
-    // Reactive parse execution
-    $effect(() => {
-        try {
-            if (inputHex.trim()) {
-                parsedNodes = parseTLV(inputHex, { encoding: selectedCodePage });
-                parseError = '';
-            } else {
-                parsedNodes = [];
-                parseError = '';
-            }
-        } catch (err: any) {
-            parseError = err?.message || 'Error parsing TLV structure';
-            parsedNodes = [];
-        }
-    });
 
     // Reactive converter updates
     $effect(() => {
@@ -108,7 +104,7 @@
         },
         {
             name: 'EMV FCI Template (Constructed TLV)',
-            hex: '6F1E8407A0000000031010A513500BC8C5D3D3D640E6D6D9D3C49F0206000000001000',
+            hex: '6F218407A0000000031010A516500BC8C5D3D3D640E6D6D9D3C49F0206000000001000',
             desc: 'Nested BER-TLV template with DF Name, App Label, and Amount'
         },
         {
@@ -130,7 +126,6 @@
 
     function clearAll() {
         inputHex = '';
-        parsedNodes = [];
     }
 </script>
 
@@ -186,7 +181,7 @@
                 {/if}
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="space-y-2">
                 <select 
                     id="code-page-select"
                     bind:value={selectedCodePage}
@@ -201,8 +196,8 @@
 
                 {#if selectedCodePage}
                     {@const currentCP = codePages.find(c => c.id === selectedCodePage)}
-                    <div class="text-xs text-surface-500 dark:text-surface-400 p-2 rounded-xl bg-surface-200/50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800 flex items-center">
-                        <span class="line-clamp-2">{currentCP?.description}</span>
+                    <div class="text-xs text-surface-500 dark:text-surface-400 px-3 py-1.5 rounded-xl bg-surface-200/50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-800 flex items-center">
+                        <span class="line-clamp-1">{currentCP?.description}</span>
                     </div>
                 {/if}
             </div>

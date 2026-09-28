@@ -361,7 +361,20 @@ Singapore Blood Levels
             const { filterDeveloperApplications } = await import('./utils');
             expect(filterDeveloperApplications(mockApps, 'nonexistent', 'All')).toHaveLength(0);
         });
+
+        it('validates developerApplications flagship snippet hex and byte length integrity', async () => {
+            const { developerApplications } = await import('./data');
+            const tlvApp = developerApplications.find(a => a.id === 'tlv-parser');
+            expect(tlvApp).toBeDefined();
+            expect(tlvApp?.previewSnippet).toBeDefined();
+
+            const hexNoSpaces = tlvApp!.previewSnippet!.inputValue.replace(/\s+/g, '');
+            // 70 hex characters = 35 bytes
+            expect(hexNoSpaces).toBe('6F218407A0000000031010A516500BC8C5D3D3D640E6D6D9D3C49F0206000000001000');
+            expect(hexNoSpaces.length / 2).toBe(35);
+        });
     });
 });
+
 
 

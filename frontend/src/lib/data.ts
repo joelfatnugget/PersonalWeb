@@ -362,7 +362,7 @@ export const developerApplications: DeveloperApplication[] = [
         previewSnippet: {
             title: 'BER-TLV Inspector • IBM037 EBCDIC',
             inputLabel: 'EMV Hex Payload',
-            inputValue: '6F1E 8407 A0000000031010 A513 500B C8C5D3D3D640E6D6D9D3C4 9F02 06 000000001000',
+            inputValue: '6F21 8407 A0000000031010 A516 500B C8C5D3D3D640E6D6D9D3C4 9F02 06 000000001000',
             outputRows: [
                 { label: 'DF Name (AID)', value: 'A0000000031010 (Visa Credit/Debit)', tag: '84' },
                 { label: 'Application Label', value: 'HELLO WORLD', tag: '50' },

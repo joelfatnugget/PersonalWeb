@@ -94,4 +94,50 @@ describe('TLV Parser & Encoder', () => {
         expect(nodes[0].length).toBe(6);
         expect(nodes[0].literalValue).toBe('こんに');
     });
+
+    it('parses valid nested EMV FCI template payload with accurate length bytes into a single root tag without orphans', () => {
+        // Sample payload:
+        // Tag 6F (FCI Template, length 0x21 = 33 bytes)
+        //   Tag 84 (DF Name), length 0x07 = 7 bytes, Value A0000000031010
+        //   Tag A5 (FCI Proprietary Template, length 0x16 = 22 bytes)
+        //     Tag 50 (App Label), length 0x0B = 11 bytes, Value C8C5D3D3D640E6D6D9D3C4 ("HELLO WORLD")
+        //     Tag 9F02 (Amount Auth), length 0x06 = 6 bytes, Value 000000001000
+        // Total byte count: 1 + 1 + 33 = 35 bytes (70 hex chars)
+        const hex = '6F218407A0000000031010A516500BC8C5D3D3D640E6D6D9D3C49F0206000000001000';
+        const nodes = parseTLV(hex, { encoding: 'IBM037' });
+
+        // Must parse strictly into 1 root node with 0 orphan trailing tags
+        expect(nodes).toHaveLength(1);
+        const root = nodes[0];
+        expect(root.tag).toBe('6F');
+        expect(root.length).toBe(33);
+        expect(root.isConstructed).toBe(true);
+        expect(root.children).toHaveLength(2);
+
+        // Child 1: Tag 84
+        const tag84 = root.children![0];
+        expect(tag84.tag).toBe('84');
+        expect(tag84.length).toBe(7);
+        expect(tag84.valueHex.toUpperCase()).toBe('A0000000031010');
+
+        // Child 2: Tag A5 (Constructed)
+        const tagA5 = root.children![1];
+        expect(tagA5.tag).toBe('A5');
+        expect(tagA5.length).toBe(22);
+        expect(tagA5.isConstructed).toBe(true);
+        expect(tagA5.children).toHaveLength(2);
+
+        // Nested child 2.1: Tag 50
+        const tag50 = tagA5.children![0];
+        expect(tag50.tag).toBe('50');
+        expect(tag50.length).toBe(11);
+        expect(tag50.literalValue).toBe('HELLO WORLD');
+
+        // Nested child 2.2: Tag 9F02
+        const tag9F02 = tagA5.children![1];
+        expect(tag9F02.tag).toBe('9F02');
+        expect(tag9F02.length).toBe(6);
+        expect(tag9F02.valueHex.toUpperCase()).toBe('000000001000');
+    });
 });
+

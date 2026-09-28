@@ -35,7 +35,7 @@
 </div>
 
 <!-- Main Content Area with Reduced Motion Guard -->
-<main class="min-h-screen pt-20 pb-24 overflow-x-hidden">
+<main class="min-h-screen pt-20 pb-24 md:pb-16 md:pl-24 lg:pl-28 md:pr-4 overflow-x-hidden">
     {#key $page.url.pathname}
         <div 
             in:fly={prefersReducedMotion ? { duration: 0 } : { y: 20, duration: 400, delay: 100, easing: cubicOut }} 
@@ -46,7 +46,7 @@
     {/key}
 </main>
 
-<div class="no-print">
+<div class="no-print md:pl-24 lg:pl-28 md:pr-4">
     <Footer />
 </div>
 
