@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { Project, Experience, BlogPostPreview } from "./data";
+import type { Project, Experience, BlogPostPreview, DeveloperApplication } from "./data";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -283,6 +283,25 @@ export function parseBloodDataFromMarkdown(markdownText: string): ParsedBloodDat
 
     return { bloodData, updatedAt };
 }
+
+export function filterDeveloperApplications(
+    apps: DeveloperApplication[],
+    query: string = '',
+    category: string = 'All'
+): DeveloperApplication[] {
+    const q = query.trim().toLowerCase();
+    return apps.filter(app => {
+        const matchesCategory = category === 'All' || app.category.toLowerCase().includes(category.toLowerCase());
+        const matchesQuery = !q ||
+            app.title.toLowerCase().includes(q) ||
+            app.subtitle.toLowerCase().includes(q) ||
+            app.description.toLowerCase().includes(q) ||
+            app.tags.some(tag => tag.toLowerCase().includes(q)) ||
+            (app.capabilities && app.capabilities.some(cap => cap.toLowerCase().includes(q)));
+        return matchesCategory && matchesQuery;
+    });
+}
+
 
 
 

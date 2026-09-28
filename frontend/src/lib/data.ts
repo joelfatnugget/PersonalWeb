@@ -72,6 +72,27 @@ export interface ResumeSkillCategory {
     items: string[];
 }
 
+export interface DeveloperApplication {
+    id: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    path: string;
+    status: 'Live App' | 'In Development' | 'Planned';
+    isLive: boolean;
+    category: string;
+    featured?: boolean;
+    badgeColor?: string;
+    tags: string[];
+    capabilities: string[];
+    previewSnippet?: {
+        title: string;
+        inputLabel: string;
+        inputValue: string;
+        outputRows: Array<{ label: string; value: string; tag?: string }>;
+    };
+}
+
 // --- Data ---
 
 export const personalInfo = {
@@ -317,4 +338,72 @@ export const resumeSkills: ResumeSkillCategory[] = [
     { category: "Tools", items: ["Docker", "AWS", "Azure", "MySQL", "Git", "Jenkins"] },
     { category: "Certifications", items: ["Heicoders AI100/200", "Smartcademy Data Analytics", "Google Cloud Fundamentals"] },
     { category: "Frameworks & Architecture", items: ["RAG", "REST APIs", "Microservices", "SwiftUI", "Node.js/Express", "React", "SvelteKit"] }
+];
+
+export const developerApplications: DeveloperApplication[] = [
+    {
+        id: 'tlv-parser',
+        title: 'IBM Character Set TLV Parser',
+        subtitle: 'BER-TLV Inspector & Mainframe EBCDIC Translator',
+        description: 'Comprehensive developer utility to parse nested BER-TLV structures, inspect EMV tag hierarchies, explore 256-character IBM EBCDIC hex matrices, and perform bidirectional literal translations with 15+ IBM Code Pages.',
+        path: '/applications/tlv-parser',
+        status: 'Live App',
+        isLive: true,
+        featured: true,
+        category: 'Mainframe & Banking',
+        badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+        tags: ['IBM EBCDIC', 'BER-TLV', 'EMV ISO-7816', 'Hex Inspector', 'Mainframe'],
+        capabilities: [
+            '15+ IBM EBCDIC Code Pages (IBM037, IBM500, IBM1047, IBM273...)',
+            'Recursive BER-TLV Nested Tree Visualizer & Tag Search',
+            'Interactive 16x16 Hexadecimal Character Matrix Grid',
+            'Bidirectional Hex <-> EBCDIC Raw Literal Converter'
+        ],
+        previewSnippet: {
+            title: 'BER-TLV Inspector • IBM037 EBCDIC',
+            inputLabel: 'EMV Hex Payload',
+            inputValue: '6F1E 8407 A0000000031010 A513 500B C8C5D3D3D640E6D6D9D3C4 9F02 06 000000001000',
+            outputRows: [
+                { label: 'DF Name (AID)', value: 'A0000000031010 (Visa Credit/Debit)', tag: '84' },
+                { label: 'Application Label', value: 'HELLO WORLD', tag: '50' },
+                { label: 'Authorized Amount', value: '$10.00 (000000001000)', tag: '9F02' }
+            ]
+        }
+    },
+    {
+        id: 'iso8583-packager',
+        title: 'ISO 8583 Financial Switch Packager',
+        subtitle: 'Bitfield Inspector & Message Switch Deconstructor',
+        description: 'Interactive point-of-sale and ATM protocol packer supporting Primary & Secondary Bitmaps, MTI classification (0100, 0200, 0800), and variable-length field validation.',
+        path: '#upcoming',
+        status: 'In Development',
+        isLive: false,
+        featured: false,
+        category: 'Mainframe & Banking',
+        badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+        tags: ['ISO 8583', 'Bitmap Packing', 'MTI Routing', 'Switch Architecture'],
+        capabilities: [
+            'Primary & Secondary 64/128-bit Bitmap Grid Analysis',
+            'LLVAR & LLLVAR Dynamic Length Field Decoding',
+            'Field 55 EMV Chip & Field 48 Private Data Extraction'
+        ]
+    },
+    {
+        id: 'iso20022-swift-bridge',
+        title: 'SWIFT MT & ISO 20022 Syntax Transformer',
+        subtitle: 'Financial Messaging Mapper & Cross-Border Validator',
+        description: 'Cross-standard mapper translating legacy FIN MT103 and MT202 messages into modern XML schemas (pacs.008, pacs.009, pain.001) with CBPR+ compliance rules.',
+        path: '#upcoming',
+        status: 'Planned',
+        isLive: false,
+        featured: false,
+        category: 'Payments & Protocols',
+        badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+        tags: ['ISO 20022', 'SWIFT MT103', 'pacs.008', 'CBPR+ Standards'],
+        capabilities: [
+            'MT-to-MX Block 4 Tag Mapping (Field 50K, 59, 71A)',
+            'ISO 20022 XML Syntax Schema Validation',
+            'High-Value Instant Settlement Rules Engine'
+        ]
+    }
 ];

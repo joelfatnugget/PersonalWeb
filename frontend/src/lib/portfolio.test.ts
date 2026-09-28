@@ -313,5 +313,55 @@ Singapore Blood Levels
             expect(result.bloodData).toEqual([]);
         });
     });
+
+    describe('Developer Applications Hub', () => {
+        const mockApps: any[] = [
+            {
+                id: 'tlv-parser',
+                title: 'IBM Character Set TLV Parser',
+                subtitle: 'BER-TLV Tag Inspector',
+                description: 'Parses EMV and mainframe structures',
+                tags: ['IBM EBCDIC', 'BER-TLV', 'Mainframe'],
+                category: 'Mainframe & Banking'
+            },
+            {
+                id: 'iso8583-packager',
+                title: 'ISO 8583 Message Switch',
+                subtitle: 'Financial Switch Packet Deconstructor',
+                description: 'Bitfield packing for ATM and POS',
+                tags: ['ISO 8583', 'Fintech', 'MTI'],
+                category: 'Mainframe & Banking'
+            },
+            {
+                id: 'iso20022-swift-bridge',
+                title: 'SWIFT MT & ISO 20022 Transformer',
+                subtitle: 'Financial Messaging Translator',
+                description: 'Maps MT103 to pacs.008 XML',
+                tags: ['ISO 20022', 'SWIFT'],
+                category: 'Payments & Protocols'
+            }
+        ];
+
+        it('filters applications by query string across title, subtitle, description, and tags', async () => {
+            const { filterDeveloperApplications } = await import('./utils');
+            expect(filterDeveloperApplications(mockApps, 'EBCDIC', 'All')).toHaveLength(1);
+            expect(filterDeveloperApplications(mockApps, 'ebcdic', 'All')[0].id).toBe('tlv-parser');
+            expect(filterDeveloperApplications(mockApps, 'switch', 'All')[0].id).toBe('iso8583-packager');
+            expect(filterDeveloperApplications(mockApps, 'xml', 'All')[0].id).toBe('iso20022-swift-bridge');
+        });
+
+        it('filters applications by category', async () => {
+            const { filterDeveloperApplications } = await import('./utils');
+            expect(filterDeveloperApplications(mockApps, '', 'Payments & Protocols')).toHaveLength(1);
+            expect(filterDeveloperApplications(mockApps, '', 'Mainframe & Banking')).toHaveLength(2);
+            expect(filterDeveloperApplications(mockApps, '', 'All')).toHaveLength(3);
+        });
+
+        it('returns empty array when no application matches search', async () => {
+            const { filterDeveloperApplications } = await import('./utils');
+            expect(filterDeveloperApplications(mockApps, 'nonexistent', 'All')).toHaveLength(0);
+        });
+    });
 });
+
 
